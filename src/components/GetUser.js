@@ -36,7 +36,7 @@ export default function GetUser({ token }) {
       </div>
       <div style={{display: 'flex', gap: '15px'}}>
         <h2>Refresh Token</h2>
-        <input readOnly value={refreshToken} />
+        {/* <input readOnly value={} /> */}
       </div>
     </div>
   );
