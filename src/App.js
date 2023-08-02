@@ -12,7 +12,6 @@ import RegisterForm from "./components/RegisterForm";
 const App = () => {
   const [auth, setAuth] = useState(false);
   const [token, setToken] = useState('');
-  const [refreshToken, setRefreshToken] = useState('');
   const {
     account,
     activateBrowserWallet,
@@ -56,7 +55,7 @@ const App = () => {
       <AuthStateListener setAuth={setAuth} setToken={setToken} />
       {auth ? (
         <div className="signedIn">
-          <GetUser token={token} refreshToken={refreshToken} />
+          <GetUser token={token} />
           {!account && (
             <button onClick={() => handleConnectWallet()}>Connect Wallet</button>
           )}

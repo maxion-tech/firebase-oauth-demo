@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 
-export default function GetUser({ token, refreshToken }) {
+export default function GetUser({ token }) {
   const [user, setUser] = useState({});
 
   const fetchData = useCallback(async (token) => {

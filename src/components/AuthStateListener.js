@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import firebase from "../config/firebaseConfig";
 
-const AuthStateListener = ({ setAuth, setToken, setRefreshToken }) => {
+const AuthStateListener = ({ setAuth, setToken }) => {
   const [authStateInitialized, setAuthStateInitialized] = useState(false);
 
   useEffect(() => {
@@ -18,7 +18,6 @@ const AuthStateListener = ({ setAuth, setToken, setRefreshToken }) => {
           const userEmail = user.email;
           console.log("user's email: ", userEmail);
           setToken(token);
-          // setRefreshToken(refreshToken);
           console.log(`token = ${token}`);
           console.log(`refresh token = ${refreshToken}`);
           
