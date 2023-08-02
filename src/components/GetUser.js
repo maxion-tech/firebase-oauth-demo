@@ -18,14 +18,14 @@ export default function GetUser({ token }) {
     } catch (error) {
       console.error('Error fetching data:', error);
     }
-  }, []); // Empty dependency array since fetchData doesn't depend on any props or state
+  }, [user]); // Empty dependency array since fetchData doesn't depend on any props or state
 
   // Run fetchData only once during the initial mount
   useEffect(() => {
     if (token) {
       fetchData(token);
     }
-  }, []); // Empty dependency array to run the effect only once
+  }, [fetchData, token]); // Empty dependency array to run the effect only once
 
   return (
     <div>

@@ -32,7 +32,7 @@ const AuthStateListener = ({ setAuth, setToken }) => {
       });
 
     return () => unsubscribe();
-  }, [setAuth, authStateInitialized]); // Include authStateInitialized in the dependency array
+  }, [setAuth, authStateInitialized, setToken]); // Include authStateInitialized in the dependency array
 
   // Render nothing until the authentication state is initialized
   if (!authStateInitialized) {
