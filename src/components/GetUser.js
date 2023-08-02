@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 
-export default function GetUser({ token }) {
+export default function GetUser({ token, refreshToken }) {
   const [user, setUser] = useState({});
 
   const fetchData = useCallback(async (token) => {
@@ -29,7 +29,15 @@ export default function GetUser({ token }) {
 
   return (
     <div>
-      <h1>Hello, {user.name}</h1>
+      <h1>Hello, {user.displayName}</h1>
+      <div style={{display: 'flex', gap: '15px'}}>
+        <h2>Access Token</h2>
+        <input readOnly value={token} />
+      </div>
+      <div style={{display: 'flex', gap: '15px'}}>
+        <h2>Refresh Token</h2>
+        <input readOnly value={refreshToken} />
+      </div>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import firebase from "../config/firebaseConfig";
 
-const AuthStateListener = ({ setAuth, setToken }) => {
+const AuthStateListener = ({ setAuth, setToken, setRefreshToken }) => {
   const [authStateInitialized, setAuthStateInitialized] = useState(false);
 
   useEffect(() => {
@@ -14,10 +14,14 @@ const AuthStateListener = ({ setAuth, setToken }) => {
           console.log("User is signed in:", user);
           window.localStorage.setItem('auth', 'true');
           const token = await user.getIdToken();
+          const refreshToken = "";
           const userEmail = user.email;
           console.log("user's email: ", userEmail);
           setToken(token);
+          // setRefreshToken(refreshToken);
           console.log(`token = ${token}`);
+          console.log(`refresh token = ${refreshToken}`);
+          
         } else {
           // User is signed out
           console.log("User is signed out");
