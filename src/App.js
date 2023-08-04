@@ -28,11 +28,12 @@ const App = () => {
       console.log('token = ', token);
       console.log('web3token = ', walletToken);
       await axios.post(
-        'http://localhost:5000/user/wallet-register', {},
+        'http://localhost:5000/user/wallet-register', {
+          "web3token":walletToken
+        },
         {
           headers: {
             Authorization: 'Bearer ' + token,
-            'Authorization-Token': walletToken
           },
         }
       );
