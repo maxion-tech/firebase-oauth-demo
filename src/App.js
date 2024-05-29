@@ -13,6 +13,7 @@ import {
   faClipboard,
   faPlugCircleXmark,
   faSignature,
+  faWallet,
 } from '@fortawesome/free-solid-svg-icons';
 
 const App = () => {
@@ -34,9 +35,9 @@ const App = () => {
       console.log('token = ', token);
       console.log('web3token = ', walletToken);
       await axios.post(
-        'http://localhost:5000/user/wallet-register',
+        'https://account.landverse.dev.maxion.gg/api/user/wallet-register',
         {
-          web3token: walletToken,
+          web3Token: walletToken,
         },
         {
           headers: {
@@ -46,6 +47,7 @@ const App = () => {
       );
     } catch (error) {
       console.error('Error registering the wallet:', error);
+      alert(error.response.data.message);
     }
   };
 
@@ -101,25 +103,54 @@ const App = () => {
           )}
           {account && connector && (
             <>
+              <div className="flex space-x-5">
+                <button
+                  onClick={async () => {
+                    const signer = library.getSigner();
+                    const web3TokenTest = await sign(
+                      async (msg) => await signer.signMessage(msg),
+                      '1d',
+                    );
+                    setWalletToken(web3TokenTest);
+                  }}
+                  className={`${
+                    walletToken ? 'w-1/3' : 'w-full'
+                  } p-3 rounded-lg flex justify-center items-center space-x-3 text-black bg-primary transition-all duration-1000  
+                  ease-out`}
+                >
+                  <FontAwesomeIcon icon={faSignature} />
+                  <p>Sign</p>
+                </button>
+                {walletToken && (
+                  <div
+                    className={`h-14 ${
+                      walletToken ? 'w-2/3' : 'w-0'
+                    }  p-3 flex justify-between rounded-xl bg-[#282a36]`}
+                  >
+                    <input
+                      type="text"
+                      value={walletToken}
+                      className="w-full outline-none bg-transparent"
+                      readOnly
+                    />
+                    <button
+                      className="h-full w-12"
+                      onClick={() => {
+                        navigator.clipboard.writeText(walletToken);
+                        alert('Copied wallet token to clipboard');
+                      }}
+                    >
+                      <FontAwesomeIcon icon={faClipboard} />
+                    </button>
+                  </div>
+                )}
+              </div>
               <button
                 onClick={handleWalletRegister}
                 className="w-full p-3 rounded-lg flex justify-center items-center space-x-3 text-black bg-primary"
               >
-                Register Wallet To Backend
-              </button>
-              <button
-                onClick={async () => {
-                  const signer = library.getSigner();
-                  const web3TokenTest = await sign(
-                    async (msg) => await signer.signMessage(msg),
-                    '1d',
-                  );
-                  setWalletToken(web3TokenTest);
-                }}
-                className="w-full p-3 rounded-lg flex justify-center items-center space-x-3 text-black bg-primary"
-              >
-                <FontAwesomeIcon icon={faSignature} />
-                <p>Sign</p>
+                <FontAwesomeIcon icon={faWallet} />
+                <p>Register Wallet To Backend</p>
               </button>
             </>
           )}
@@ -132,7 +163,7 @@ const App = () => {
               <p>Disconnect</p>
             </button>
           )}
-          {walletToken && <input readOnly value={walletToken} />}
+
           <RegisterForm token={token} />
           <SignOutButton />
         </div>

@@ -6,7 +6,7 @@ const GoogleRegister = () => {
       try {
         console.log('token for register: ', token);
          const res = await axios.post(
-        'http://localhost:5000/user/createUser',
+        'https://account.landverse.dev.maxion.gg/api/user/createUser',
         {
           headers: {
             Authorization: 'Bearer ' + token,

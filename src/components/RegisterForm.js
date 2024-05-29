@@ -1,3 +1,6 @@
+import { faUserPlus } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import axios from 'axios';
 import React, { useState } from 'react';
 
 const RegisterForm = ({ token }) => {
@@ -12,7 +15,7 @@ const RegisterForm = ({ token }) => {
     setPassword(event.target.value);
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     // You can add validation here before sending the data to the server
     const userData = {
@@ -20,22 +23,20 @@ const RegisterForm = ({ token }) => {
       password: password,
     };
     // Call the API to send the user data to the server (Node.js backend)
-    fetch('http://localhost:5000/user/game-register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + token,
-      },
-      body: JSON.stringify(userData),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        // Handle the response from the server if needed
-        console.log('Response from the server:', data);
-      })
-      .catch((error) => {
-        console.error('Error:', error);
-      });
+    try {
+      await axios.post(
+        'https://account.landverse.dev.maxion.gg/api/user/game-register',
+        userData,
+        {
+          headers: {
+            Authorization: 'Bearer ' + token,
+          },
+        },
+      );
+    } catch (error) {
+      console.error('Error registering the wallet:', error);
+      alert(error.response.data.message);
+    }
   };
 
   return (
@@ -71,7 +72,8 @@ const RegisterForm = ({ token }) => {
         type="submit"
         className="w-full p-3 rounded-lg flex justify-center items-center space-x-3 text-black bg-primary"
       >
-        Register
+        <FontAwesomeIcon icon={faUserPlus} />
+        <p>Register</p>
       </button>
     </form>
   );
