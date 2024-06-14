@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faClipboard } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faClipboard } from '@fortawesome/free-solid-svg-icons';
 import { TypeAnimation } from 'react-type-animation';
 
-export default function GetUser({ token }) {
+export default function GetUser({ token, copy, setCopy }) {
   const [user, setUser] = useState();
 
   const fetchData = async (token) => {
@@ -59,10 +59,13 @@ export default function GetUser({ token }) {
             className="h-full w-12"
             onClick={() => {
               navigator.clipboard.writeText(token);
-              alert('Copied token to clipboard');
+              setCopy(true);
+              setTimeout(() => {
+                setCopy(false);
+              }, 1000);
             }}
           >
-            <FontAwesomeIcon icon={faClipboard} />
+            <FontAwesomeIcon icon={copy ? faCheck : faClipboard} />
           </button>
         </div>
       </div>
