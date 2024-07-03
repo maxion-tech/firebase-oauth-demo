@@ -1,7 +1,6 @@
 import {
   faCheck,
   faChevronDown,
-  faChevronUp,
   faClipboard,
   faPlugCircleXmark,
   faSignature,
@@ -24,7 +23,6 @@ import AuthStateListener from './components/AuthStateListener';
 import FacebookSignInButton from './components/FacebookSignInButton';
 import GetUser from './components/GetUser';
 import GoogleSignInButton from './components/GoogleSignInButton';
-import RegisterForm from './components/RegisterForm';
 import SignOutButton from './components/SignOutButton';
 import { ProviderType, providers } from './constants';
 
