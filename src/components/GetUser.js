@@ -31,7 +31,7 @@ export default function GetUser({ token, copy, provider, setCopy }) {
     if (token && provider.type === ProviderType.PLATFORM) {
       fetchData(token);
     }
-  }, [token]);
+  }, [token, provider.type]);
 
   return (
     <div className="space-y-3">
