@@ -1,18 +1,17 @@
 import React from 'react';
-import firebase from '../config/firebaseConfig';
+import firebase from 'firebase/compat/app';
 
-const GoogleSignInButton = ({ setAuth, setToken }) => {
+const GoogleSignInButton = ({ setAuth, setToken, firebaseApp }) => {
   const handleSignIn = async () => {
     const provider = new firebase.auth.GoogleAuthProvider();
 
     try {
-      const result = await firebase.auth().signInWithPopup(provider);
+      const result = await firebaseApp.auth().signInWithPopup(provider);
       const user = result.user;
       setAuth(true);
-      await setToken(user.accessToken);
+      setToken(await user.getIdToken());
       window.localStorage.setItem('auth', 'true');
       console.log('User signed in:', user);
-      console.log('token: ', user.accessToken);
     } catch (error) {
       console.error('Sign-in error:', error);
     }

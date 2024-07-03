@@ -1,17 +1,13 @@
 import React from 'react';
-import firebase from '../config/firebaseConfig';
 import { faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-const SignOutButton = () => {
-  const handleSignOut = async ({ setAuth, setUser, setToken, setWalletToken }) => {
+const SignOutButton = ({ setAuth, firebaseApp }) => {
+  const handleSignOut = async () => {
     try {
-      await firebase.auth().signOut();
+      await firebaseApp.auth().signOut();
       console.log('User signed out');
-      setAuth(false);
-      setUser(null);
-      setToken(null);
-      setWalletToken(null);
+      setAuth(null);
     } catch (error) {
       console.error('Sign-out error:', error);
     }

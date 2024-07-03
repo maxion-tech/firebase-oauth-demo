@@ -3,8 +3,9 @@ import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faClipboard } from '@fortawesome/free-solid-svg-icons';
 import { TypeAnimation } from 'react-type-animation';
+import { ProviderType } from '../constants';
 
-export default function GetUser({ token, copy, setCopy }) {
+export default function GetUser({ token, copy, provider, setCopy }) {
   const [user, setUser] = useState();
 
   const fetchData = async (token) => {
@@ -27,7 +28,7 @@ export default function GetUser({ token, copy, setCopy }) {
 
   // Use the fetchData function from outside the component
   useEffect(() => {
-    if (token) {
+    if (token && provider.type === ProviderType.PLATFORM) {
       fetchData(token);
     }
   }, [token]);
@@ -35,7 +36,7 @@ export default function GetUser({ token, copy, setCopy }) {
   return (
     <div className="space-y-3">
       <div className="h-12 w-1/2">
-        {user && (
+        {user ? (
           <TypeAnimation
             cursor={false}
             sequence={[`Hello, ${user.displayName}`, 3000, '']}
@@ -44,6 +45,8 @@ export default function GetUser({ token, copy, setCopy }) {
             wrapper="h1"
             repeat={Infinity}
           />
+        ) : (
+          <h1 className="text-2xl">Maxion CMS</h1>
         )}
       </div>
       <div className="flex items-center space-x-5">

@@ -1,14 +1,13 @@
 import React from 'react';
-import firebase from '../config/firebaseConfig';
+import firebase from 'firebase/compat/app';
 
-const FacebookSignInButton = ({ setAuth, setToken }) => {
+const FacebookSignInButton = ({ setAuth, setToken, firebaseApp }) => {
   const handleSignIn = async () => {
     const provider = new firebase.auth.FacebookAuthProvider();
     provider.addScope('email');
 
     try {
-      console.log('Test log');
-      const result = await firebase.auth().signInWithPopup(provider);
+      const result = await firebaseApp.auth().signInWithPopup(provider);
       const user = result.user;
       setAuth(true);
       setToken(user.accessToken);
