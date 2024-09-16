@@ -1,7 +1,7 @@
 import React from 'react';
 import firebase from 'firebase/compat/app';
 
-const GoogleSignInButton = ({ setAuth, setToken, firebaseApp }) => {
+const GoogleSignInButton = ({ setAuth, setToken, setRefreshToken, firebaseApp }) => {
   const handleSignIn = async () => {
     const provider = new firebase.auth.GoogleAuthProvider();
 
@@ -10,6 +10,7 @@ const GoogleSignInButton = ({ setAuth, setToken, firebaseApp }) => {
       const user = result.user;
       setAuth(true);
       setToken(await user.getIdToken());
+      setRefreshToken(user.refreshToken);
       window.localStorage.setItem('auth', 'true');
       console.log('User signed in:', user);
     } catch (error) {

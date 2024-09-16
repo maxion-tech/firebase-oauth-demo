@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { cmsFirebase, platformFirebase } from '../config/firebaseConfig';
 import { ProviderType, providers } from '../constants';
 
-const AuthStateListener = ({ setAuth, setToken, setProvider }) => {
+const AuthStateListener = ({ setAuth, setToken, setRefreshToken, setProvider }) => {
   const [authStateInitialized, setAuthStateInitialized] = useState(false);
 
   useEffect(() => {
@@ -22,6 +22,7 @@ const AuthStateListener = ({ setAuth, setToken, setProvider }) => {
           const userEmail = user.email;
           console.log("user's email: ", userEmail);
           setToken(token);
+          setRefreshToken(user.refreshToken);
         } else {
           // User is signed out
           console.log('User is signed out Platform');

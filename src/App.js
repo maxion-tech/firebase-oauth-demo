@@ -29,6 +29,7 @@ import { ProviderType, providers } from './constants';
 const App = () => {
   const [auth, setAuth] = useState(false);
   const [token, setToken] = useState('');
+  const [refreshToken, setRefreshToken] = useState('');
   const [copyToken, setCopyToken] = useState(false);
   const [copyAddress, setCopyAddress] = useState(false);
   const [copyWalletToken, setCopyWalletToken] = useState(false);
@@ -74,6 +75,7 @@ const App = () => {
         <AuthStateListener
           setAuth={setAuth}
           setToken={setToken}
+          setRefreshToken={setRefreshToken}
           setProvider={setProvider}
           firebaseApp={provider.firebaseApp}
         />
@@ -82,6 +84,7 @@ const App = () => {
             <div className="h-fit w-1/2 space-y-4 p-10 rounded-3xl bg-subBackground">
               <GetUser
                 token={token}
+                refreshToken={refreshToken}
                 copy={copyToken}
                 provider={provider}
                 setCopy={setCopyToken}
@@ -261,6 +264,7 @@ const App = () => {
                   <GoogleSignInButton
                     setAuth={setAuth}
                     setToken={setToken}
+                    setRefreshToken={setRefreshToken}
                     firebaseApp={provider.firebaseApp}
                   />
                   <FacebookSignInButton
