@@ -47,6 +47,7 @@ const AuthStateListener = ({ setAuth, setToken, setRefreshToken, setProvider }) 
         const userEmail = user.email;
         console.log("user's email: ", userEmail);
         setToken(token);
+        setRefreshToken(user.refreshToken);
       } else {
         // User is signed out
         console.log('User is signed out CMS');
@@ -61,7 +62,7 @@ const AuthStateListener = ({ setAuth, setToken, setRefreshToken, setProvider }) 
 
     platformSubscribed();
     cmsSubscribed();
-  }, [setAuth, authStateInitialized, setToken, setProvider]); // Include authStateInitialized in the dependency array
+  }, [setAuth, authStateInitialized, setToken, setRefreshToken, setProvider]); // Include authStateInitialized in the dependency array
 
   // Render nothing until the authentication state is initialized
   if (!authStateInitialized) {
