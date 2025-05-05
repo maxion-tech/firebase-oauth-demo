@@ -60,7 +60,7 @@ const config = {
 };
 
 const App = () => {
-  const [, setAuth] = useState(false);
+  const [auth, setAuth] = useState(false);
   const [token, setToken] = useState('');
   const [refreshToken, setRefreshToken] = useState('');
   const [copyToken, setCopyToken] = useState(false);
@@ -158,20 +158,20 @@ const App = () => {
 
   return (
     <DAppProvider config={config}>
+      <AuthStateListener
+        setAuth={setAuth}
+        setToken={setToken}
+        setRefreshToken={setRefreshToken}
+        setProvider={setProvider}
+        firebaseApp={provider.firebaseApp}
+      />
       <div className="relative">
         <div
           className={
             'h-screen flex flex-col justify-center items-center text-white bg-subBackground2'
           }
         >
-          <AuthStateListener
-            setAuth={setAuth}
-            setToken={setToken}
-            setRefreshToken={setRefreshToken}
-            setProvider={setProvider}
-            firebaseApp={provider.firebaseApp}
-          />
-          {true ? (
+          {auth ? (
             <>
               <div className="flex justify-center items-center space-x-6 mt-5">
                 <div className="h-24 flex justify-center items-center space-x-2 text-4xl font-poppins font-extrabold">
