@@ -1,11 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faClipboard } from '@fortawesome/free-solid-svg-icons';
-import { TypeAnimation } from 'react-type-animation';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 import { ProviderType } from '../constants';
 
-export default function GetUser({ token, refreshToken, copy, provider, setCopy }) {
+export default function GetUser({
+  token,
+  refreshToken,
+  provider,
+  copyToken,
+  setCopyToken,
+  copyRefreshToken,
+  setCopyRefreshToken,
+}) {
   const [user, setUser] = useState();
 
   const fetchData = async (token) => {
@@ -35,64 +42,56 @@ export default function GetUser({ token, refreshToken, copy, provider, setCopy }
 
   return (
     <div className="space-y-3">
-      <div className="h-12 w-1/2">
-        {user ? (
-          <TypeAnimation
-            cursor={false}
-            sequence={[`Hello, ${user.displayName}`, 3000, '']}
-            speed={40}
-            style={{ fontSize: '1.75rem' }}
-            wrapper="h1"
-            repeat={Infinity}
-          />
-        ) : (
-          <h1 className="text-2xl">Maxion CMS</h1>
-        )}
-      </div>
-      <div className="flex items-center space-x-5">
-        <p>Access Token</p>
-        <div className="h-14 w-2/3 p-3 flex justify-between rounded-xl bg-[#282a36]">
-          <input
-            type="text"
-            value={token}
-            className="w-10/12 outline-none bg-transparent truncate"
-            readOnly
-          />
-          <button
-            className="h-full w-12"
-            onClick={() => {
-              navigator.clipboard.writeText(token);
-              setCopy(true);
-              setTimeout(() => {
-                setCopy(false);
-              }, 1000);
-            }}
-          >
-            <FontAwesomeIcon icon={copy ? faCheck : faClipboard} />
-          </button>
+      <div className="w-full flex flex-col space-y-3">
+        <div className="w-full space-y-3">
+          <div className="flex justify-center items-center bg-gray-300 text-black rounded-md">
+            <p>Access Token</p>
+          </div>
+          <div className="h-12 w-full p-3 flex justify-between rounded-lg bg-[#282a36]">
+            <input
+              type="text"
+              value={token}
+              className="w-10/12 outline-none bg-transparent truncate"
+              readOnly
+            />
+            <button
+              className="h-full w-12"
+              onClick={() => {
+                navigator.clipboard.writeText(token);
+                setCopyToken(true);
+                setTimeout(() => {
+                  setCopyToken(false);
+                }, 1000);
+              }}
+            >
+              <FontAwesomeIcon icon={copyToken ? faCheck : faClipboard} />
+            </button>
+          </div>
         </div>
-      </div>
-      <div className="flex items-center space-x-5">
-        <p>Refresh Token</p>
-        <div className="h-14 w-2/3 p-3 flex justify-between rounded-xl bg-[#282a36]">
-          <input
-            type="text"
-            value={refreshToken}
-            className="w-10/12 outline-none bg-transparent truncate"
-            readOnly
-          />
-          <button
-            className="h-full w-12"
-            onClick={() => {
-              navigator.clipboard.writeText(refreshToken);
-              setCopy(true);
-              setTimeout(() => {
-                setCopy(false);
-              }, 1000);
-            }}
-          >
-            <FontAwesomeIcon icon={copy ? faCheck : faClipboard} />
-          </button>
+        <div className="w-full space-y-3">
+          <div className="flex justify-center items-center bg-gray-300 text-black rounded-md">
+            <p>Refresh Token</p>
+          </div>
+          <div className="h-12 w-full p-3 flex justify-between rounded-lg bg-[#282a36]">
+            <input
+              type="text"
+              value={refreshToken}
+              className="w-10/12 outline-none bg-transparent truncate"
+              readOnly
+            />
+            <button
+              className="h-full w-12"
+              onClick={() => {
+                navigator.clipboard.writeText(refreshToken);
+                setCopyRefreshToken(true);
+                setTimeout(() => {
+                  setCopyRefreshToken(false);
+                }, 1000);
+              }}
+            >
+              <FontAwesomeIcon icon={copyRefreshToken ? faCheck : faClipboard} />
+            </button>
+          </div>
         </div>
       </div>
     </div>
