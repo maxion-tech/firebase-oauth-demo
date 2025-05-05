@@ -26,7 +26,6 @@ import {
   useContractFunction,
   useEthers,
 } from '@usedapp/core';
-import axios from 'axios';
 import { constants, Contract } from 'ethers';
 import { formatEther, Interface, parseUnits } from 'ethers/lib/utils';
 import React, { Fragment, useState } from 'react';
@@ -61,7 +60,7 @@ const config = {
 };
 
 const App = () => {
-  const [auth, setAuth] = useState(false);
+  const [, setAuth] = useState(false);
   const [token, setToken] = useState('');
   const [refreshToken, setRefreshToken] = useState('');
   const [copyToken, setCopyToken] = useState(false);
@@ -96,26 +95,26 @@ const App = () => {
     },
   );
 
-  const handleWalletRegister = async () => {
-    try {
-      console.log('token = ', token);
-      console.log('web3token = ', walletToken);
-      await axios.post(
-        'https://account.landverse.dev.maxion.gg/api/user/wallet-register',
-        {
-          web3Token: walletToken,
-        },
-        {
-          headers: {
-            Authorization: 'Bearer ' + token,
-          },
-        },
-      );
-    } catch (error) {
-      console.error('Error registering the wallet:', error);
-      alert(error.response.data.message);
-    }
-  };
+  // const handleWalletRegister = async () => {
+  //   try {
+  //     console.log('token = ', token);
+  //     console.log('web3token = ', walletToken);
+  //     await axios.post(
+  //       'https://account.landverse.dev.maxion.gg/api/user/wallet-register',
+  //       {
+  //         web3Token: walletToken,
+  //       },
+  //       {
+  //         headers: {
+  //           Authorization: 'Bearer ' + token,
+  //         },
+  //       },
+  //     );
+  //   } catch (error) {
+  //     console.error('Error registering the wallet:', error);
+  //     alert(error.response.data.message);
+  //   }
+  // };
 
   const handleConnectWallet = async () => {
     try {
