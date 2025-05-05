@@ -11,7 +11,7 @@ export const providers = [
     type: ProviderType.PLATFORM,
     firebaseApp: platformFirebase,
   },
-  { name: 'Maxion CMS', type: ProviderType.CMS, firebaseApp: cmsFirebase },
+  // { name: 'Maxion CMS', type: ProviderType.CMS, firebaseApp: cmsFirebase },
 ];
 
 export const chains = [
