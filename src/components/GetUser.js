@@ -13,7 +13,7 @@ export default function GetUser({
   copyRefreshToken,
   setCopyRefreshToken,
 }) {
-  const [user, setUser] = useState();
+  const [, setUser] = useState();
 
   const fetchData = async (token) => {
     try {
