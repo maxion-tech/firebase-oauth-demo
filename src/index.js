@@ -4,15 +4,7 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import {
-  // Mainnet,
-  DAppProvider,
-  // useEtherBalance,
-  // useEthers,
-  // Config,
-  // Goerli,
-  BSCTestnet,
-} from '@usedapp/core';
+import { DAppProvider, BSCTestnet } from '@usedapp/core';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -24,13 +16,14 @@ root.render(
   <StrictMode>
     <DAppProvider config={config}>
       <header>
-        <title>Ragnarok Landverse Authentication | Maxion</title>
+        <title>Maxion Dev Hub</title>
         <link
           href="/icons/favicon.ico"
           rel="icon"
           media="(prefers-color-scheme: light)"
         />
         <link href="/icons/favicon.ico" rel="icon" media="(prefers-color-scheme: dark)" />
+        <link href="https://fonts.googleapis.com/css?family=Poppins" rel="stylesheet" />
         <meta name="description" content="Maxion Tech" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </header>
