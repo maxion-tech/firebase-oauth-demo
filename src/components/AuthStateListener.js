@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { cmsFirebase, platformFirebase } from '../config/firebaseConfig';
+import { platformFirebase } from '../config/firebaseConfig';
 import { ProviderType, providers } from '../constants';
 
 const AuthStateListener = ({ setAuth, setToken, setRefreshToken, setProvider }) => {

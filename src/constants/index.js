@@ -1,4 +1,4 @@
-import { cmsFirebase, platformFirebase } from '../config/firebaseConfig';
+import { platformFirebase } from '../config/firebaseConfig';
 
 export const ProviderType = Object.freeze({
   PLATFORM: 'PLATFORM',
@@ -11,7 +11,6 @@ export const providers = [
     type: ProviderType.PLATFORM,
     firebaseApp: platformFirebase,
   },
-  // { name: 'Maxion CMS', type: ProviderType.CMS, firebaseApp: cmsFirebase },
 ];
 
 export const chains = [
