@@ -6,7 +6,7 @@ const AuthStateListener = ({ setAuth, setToken, setRefreshToken, setProvider }) 
   const [authStateInitialized, setAuthStateInitialized] = useState(false);
 
   useEffect(() => {
-    platformFirebase.auth().onIdTokenChanged(async (user) => {
+    platformFirebase.auth().onAuthStateChanged(async (user) => {
       if (user) {
         console.log('Signed in Platform');
         // User is signed in
