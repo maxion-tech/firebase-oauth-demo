@@ -150,7 +150,11 @@ const App = () => {
         },
       })
       .then((res) => {
-        setInventories(res.data.filter(Boolean));
+        if (res?.data) {
+          const data = res.data.filter(Boolean);
+          setInventories(data);
+          setSelectedItems(new Set(data.map((inventory) => inventory.id)));
+        }
       })
       .catch((error) => console.log('error: ', error.response.data));
   };
@@ -161,13 +165,12 @@ const App = () => {
 
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-  const bulkMintNFTs = async () => {
+  const handleBulkMint = async () => {
     const confirm = window.confirm(
       'Are you sure you want to mint all items in your inventory?',
     );
     if (confirm) {
-      const inventoryIds = inventories.map((inventory) => inventory.id).filter(Boolean);
-      for (const inventoryId of inventoryIds) {
+      for (const inventoryId of selectedItems) {
         try {
           await axios
             .post(
@@ -189,7 +192,7 @@ const App = () => {
     }
   };
 
-  const toggleItem = (id) => {
+  const handleSelectItem = (id) => {
     setSelectedItems((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(id)) {
@@ -197,9 +200,17 @@ const App = () => {
       } else {
         newSet.add(id);
       }
-      console.log('🚀 newSet:', newSet);
       return newSet;
     });
+  };
+
+  const handleSelectAll = () => {
+    if (selectedItems.size === inventories.length) {
+      setSelectedItems(new Set());
+    } else {
+      const allIds = inventories.map((inventory) => inventory.id);
+      setSelectedItems(new Set(allIds));
+    }
   };
 
   return (
@@ -574,56 +585,83 @@ const App = () => {
                   </TabPanel>
                   <TabPanel
                     className={
-                      'h-full rounded-b-lg p-5 space-y-5 rounded-tl-lg bg-subBackground'
+                      'h-[calc(100vh-200px)] rounded-b-lg p-5 space-y-5 rounded-tl-lg bg-subBackground'
                     }
                   >
-                    <div className="flex justify-start items-center space-x-5">
-                      <button
-                        onClick={bulkMintNFTs}
-                        className={
-                          'h-12 w-48 p-3 rounded-lg flex justify-center items-center space-x-3 text-black bg-primary transition-all duration-1000 ease-out'
-                        }
-                      >
-                        <p>Bulk Mint</p>
-                      </button>
-                      <button
-                        onClick={getMintInventories}
-                        className={
-                          'h-12 w-12 p-3 rounded-lg flex justify-center items-center space-x-3 text-black bg-[#222324] transition-all duration-1000 ease-out'
-                        }
-                      >
-                        <FontAwesomeIcon
-                          icon={faRotateRight}
-                          color="#FFC400"
-                          className={`${inventories.length === 0 ? 'animate-spin' : ''}`}
-                        />
-                      </button>
-                    </div>
-                    <div className="grid grid-cols-[repeat(auto-fill,minmax(110px,1fr))] gap-4 w-full">
-                      {inventories.map((inventory, index) => (
-                        <div
-                          className={`p-0.5 flex justify-center items-center bg-subBackground2 rounded-lg ${
-                            selectedItems.has(inventory.id)
-                              ? 'border-2 border-primary'
-                              : 'border-2 border-customGrayHeavy'
-                          }`}
+                    <div className="flex flex-col h-full">
+                      <div className="flex justify-start items-center space-x-5 mb-5">
+                        <button
+                          onClick={handleSelectAll}
+                          className={`h-8 w-8 p-3 rounded-lg flex justify-center items-center space-x-3 ${
+                            selectedItems.size === inventories.length
+                              ? 'bg-primary'
+                              : 'bg-[#222324] border-1 border-customGrayLight'
+                          } transition-all duration-100 ease-out`}
                         >
-                          <button
-                            key={index}
-                            className={`h-full w-full p-3 flex justify-center items-center bg-white rounded-md`}
-                            onClick={() => {
-                              toggleItem(inventory.id);
-                            }}
-                          >
-                            <img
-                              src={`${cdnUrls.maxi}/${inventory.itemDb.id}.png`}
-                              loading="lazy"
-                              alt="item"
-                              className="h-20"
-                            />
-                          </button>
+                          {selectedItems.size === inventories.length ? (
+                            <FontAwesomeIcon icon={faCheck} color="#101010" />
+                          ) : null}
+                        </button>
+                        <p>Selected {selectedItems.size} items</p>
+                        <button
+                          onClick={handleBulkMint}
+                          disabled={selectedItems.size === 0}
+                          className={`h-10 w-48 p-3 rounded-lg flex justify-center items-center space-x-3 ${
+                            selectedItems.size === 0
+                              ? 'text-white bg-[#3f3f3f]'
+                              : 'text-black bg-primary'
+                          } transition-all duration-300 ease-out`}
+                        >
+                          <p>Bulk Mint</p>
+                        </button>
+                        <button
+                          onClick={getMintInventories}
+                          className={
+                            'h-10 w-10 p-3 rounded-lg flex justify-center items-center space-x-3 text-black bg-[#222324] transition-all duration-300 ease-out'
+                          }
+                        >
+                          <FontAwesomeIcon
+                            icon={faRotateRight}
+                            color="#FFC400"
+                            className={`${
+                              inventories.length === 0 ? 'animate-spin' : ''
+                            }`}
+                          />
+                        </button>
+                      </div>
+                      <div className="overflow-y-auto h-[calc(100%-60px)] pr-2">
+                        <div className="grid grid-cols-[repeat(auto-fill,minmax(110px,1fr))] gap-4 w-full">
+                          {inventories.map((inventory, index) => (
+                            <div
+                              key={index}
+                              className={`p-0.5 flex justify-center items-center bg-subBackground2 rounded-lg ${
+                                selectedItems.has(inventory.id)
+                                  ? 'border-2 border-primary'
+                                  : 'border-2 border-customGrayHeavy'
+                              } transition-all duration-300 ease-out`}
+                            >
+                              <button
+                                className={`h-full w-full p-3 flex justify-center items-center bg-white rounded-md relative group`}
+                                onClick={() => {
+                                  handleSelectItem(inventory.id);
+                                }}
+                              >
+                                <img
+                                  src={`${cdnUrls.maxi}/${inventory.itemDb.id}.png`}
+                                  loading="lazy"
+                                  alt="item"
+                                  className="h-20"
+                                />
+                                <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center rounded-md">
+                                  <span className="text-white text-xl">
+                                    {inventory.id}
+                                  </span>
+                                </div>
+                              </button>
+                            </div>
+                          ))}
                         </div>
-                      ))}
+                      </div>
                     </div>
                   </TabPanel>
                 </TabPanels>
