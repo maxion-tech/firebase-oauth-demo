@@ -28,7 +28,7 @@ import {
 } from '@usedapp/core';
 import { constants, Contract } from 'ethers';
 import { formatEther, Interface, parseUnits } from 'ethers/lib/utils';
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { sign } from 'web3-token';
 import '../src/index.css';
 import AuthStateListener from './components/AuthStateListener';
@@ -39,6 +39,8 @@ import SignOutButton from './components/SignOutButton';
 import { chains, contracts, operators, providers } from './constants';
 import ION_ABI from './constants/abis/ion.json';
 import NFT_ABI from './constants/abis/nft.json';
+import axios from 'axios';
+import { apiUrls, cdnUrls } from './config';
 
 const MaxiTestnet = {
   chainId: 898,
@@ -73,6 +75,7 @@ const App = () => {
   const [walletToken, setWalletToken] = useState();
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [allowanceAmount, setAllowanceAmount] = useState();
+  const [inventories, setInventories] = useState([]);
 
   const { account, activateBrowserWallet, deactivate, library, switchNetwork } =
     useEthers();
@@ -94,27 +97,6 @@ const App = () => {
       transactionName: 'Decrease Allowance',
     },
   );
-
-  // const handleWalletRegister = async () => {
-  //   try {
-  //     console.log('token = ', token);
-  //     console.log('web3token = ', walletToken);
-  //     await axios.post(
-  //       'https://account.landverse.dev.maxion.gg/api/user/wallet-register',
-  //       {
-  //         web3Token: walletToken,
-  //       },
-  //       {
-  //         headers: {
-  //           Authorization: 'Bearer ' + token,
-  //         },
-  //       },
-  //     );
-  //   } catch (error) {
-  //     console.error('Error registering the wallet:', error);
-  //     alert(error.response.data.message);
-  //   }
-  // };
 
   const handleConnectWallet = async () => {
     try {
@@ -156,6 +138,50 @@ const App = () => {
     }
   };
 
+  const getMintInventories = async () => {
+    await axios
+      .get(`${apiUrls.maxi}/mint-inventory`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'X-Server-Id': 1,
+        },
+      })
+      .then((res) => {
+        setInventories(res.data.filter(Boolean));
+      })
+      .catch((error) => console.log('error: ', error.response.data));
+  };
+
+  useEffect(() => {
+    getMintInventories();
+  }, [token]);
+
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  const bulkMintNFTs = async () => {
+    const inventoryIds = inventories.map((inventory) => inventory.id).filter(Boolean);
+    for (const inventoryId of inventoryIds) {
+      try {
+        await axios
+          .post(
+            `${apiUrls.maxi}/mint-inventory/mint`,
+            { mintInventoryId: inventoryId },
+            { headers: { Authorization: `Bearer ${token}`, 'X-Server-Id': 1 } },
+          )
+          .then(async (res) => {
+            console.log('🚀 res:', res);
+            console.log(res?.data?.tx?.hash);
+            await getMintInventories();
+          });
+        await sleep(2000);
+      } catch (error) {
+        console.log('🚀 error:', error);
+        console.log('error: ', error.response.data);
+        await sleep(4000);
+      }
+    }
+  };
+
   return (
     <DAppProvider config={config}>
       <AuthStateListener
@@ -168,12 +194,12 @@ const App = () => {
       <div className="relative">
         <div
           className={
-            'h-screen flex flex-col justify-center items-center text-white bg-subBackground2'
+            'h-full flex flex-col justify-center items-center text-white bg-subBackground2'
           }
         >
           {auth ? (
             <>
-              <div className="flex justify-center items-center space-x-6 mt-5">
+              <div className="flex justify-center items-center space-x-6">
                 <div className="h-24 flex justify-center items-center space-x-2 text-4xl font-poppins font-extrabold">
                   <p>M</p>
                   <p>A</p>
@@ -527,9 +553,34 @@ const App = () => {
                     </div>
                   </TabPanel>
                   <TabPanel
-                    className={'h-full rounded-b-lg rounded-tl-lg bg-subBackground'}
+                    className={
+                      'h-full rounded-b-lg p-5 space-y-5 rounded-tl-lg bg-subBackground'
+                    }
                   >
-                    <div></div>
+                    <button
+                      onClick={bulkMintNFTs}
+                      className={
+                        'h-12 w-48 p-3 rounded-lg flex justify-center items-center space-x-3 text-black bg-primary transition-all duration-1000 ease-out'
+                      }
+                    >
+                      <FontAwesomeIcon icon={faSignature} />
+                      <p>Bulk Mint</p>
+                    </button>
+                    <div className="grid grid-cols-[repeat(auto-fill,minmax(105px,1fr))] gap-4 w-full">
+                      {inventories.map((inventory, index) => (
+                        <div key={index}>
+                          <div className="flex justify-center items-center p-3 bg-white border border-primary rounded-lg">
+                            <img
+                              src={`${cdnUrls.maxi}/${inventory.itemDb.id}.png`}
+                              loading="lazy"
+                              alt="item"
+                              className="h-20"
+                            />
+                          </div>
+                          <p>{inventory.id}</p>
+                        </div>
+                      ))}
+                    </div>
                   </TabPanel>
                 </TabPanels>
               </TabGroup>
