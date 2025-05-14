@@ -3,6 +3,7 @@ import {
   faChevronDown,
   faClipboard,
   faPlugCircleXmark,
+  faRotateRight,
   faSignature,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -26,6 +27,7 @@ import {
   useContractFunction,
   useEthers,
 } from '@usedapp/core';
+import axios from 'axios';
 import { constants, Contract } from 'ethers';
 import { formatEther, Interface, parseUnits } from 'ethers/lib/utils';
 import React, { Fragment, useEffect, useState } from 'react';
@@ -36,11 +38,10 @@ import FacebookSignInButton from './components/FacebookSignInButton';
 import GetUser from './components/GetUser';
 import GoogleSignInButton from './components/GoogleSignInButton';
 import SignOutButton from './components/SignOutButton';
+import { apiUrls, cdnUrls } from './config';
 import { chains, contracts, operators, providers } from './constants';
 import ION_ABI from './constants/abis/ion.json';
 import NFT_ABI from './constants/abis/nft.json';
-import axios from 'axios';
-import { apiUrls, cdnUrls } from './config';
 
 const MaxiTestnet = {
   chainId: 898,
@@ -76,6 +77,7 @@ const App = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [allowanceAmount, setAllowanceAmount] = useState();
   const [inventories, setInventories] = useState([]);
+  const [selectedItems, setSelectedItems] = useState(new Set());
 
   const { account, activateBrowserWallet, deactivate, library, switchNetwork } =
     useEthers();
@@ -139,6 +141,7 @@ const App = () => {
   };
 
   const getMintInventories = async () => {
+    setInventories([]);
     await axios
       .get(`${apiUrls.maxi}/mint-inventory`, {
         headers: {
@@ -159,27 +162,44 @@ const App = () => {
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
   const bulkMintNFTs = async () => {
-    const inventoryIds = inventories.map((inventory) => inventory.id).filter(Boolean);
-    for (const inventoryId of inventoryIds) {
-      try {
-        await axios
-          .post(
-            `${apiUrls.maxi}/mint-inventory/mint`,
-            { mintInventoryId: inventoryId },
-            { headers: { Authorization: `Bearer ${token}`, 'X-Server-Id': 1 } },
-          )
-          .then(async (res) => {
-            console.log('🚀 res:', res);
-            console.log(res?.data?.tx?.hash);
-            await getMintInventories();
-          });
-        await sleep(2000);
-      } catch (error) {
-        console.log('🚀 error:', error);
-        console.log('error: ', error.response.data);
-        await sleep(4000);
+    const confirm = window.confirm(
+      'Are you sure you want to mint all items in your inventory?',
+    );
+    if (confirm) {
+      const inventoryIds = inventories.map((inventory) => inventory.id).filter(Boolean);
+      for (const inventoryId of inventoryIds) {
+        try {
+          await axios
+            .post(
+              `${apiUrls.maxi}/mint-inventory/mint`,
+              { mintInventoryId: inventoryId },
+              { headers: { Authorization: `Bearer ${token}`, 'X-Server-Id': 1 } },
+            )
+            .then(async (res) => {
+              console.log('🚀 res:', res);
+              console.log(res?.data?.tx?.hash);
+              await getMintInventories();
+            });
+          await sleep(2000);
+        } catch (error) {
+          console.log(error);
+          await sleep(4000);
+        }
       }
     }
+  };
+
+  const toggleItem = (id) => {
+    setSelectedItems((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      console.log('🚀 newSet:', newSet);
+      return newSet;
+    });
   };
 
   return (
@@ -194,7 +214,7 @@ const App = () => {
       <div className="relative">
         <div
           className={
-            'h-full flex flex-col justify-center items-center text-white bg-subBackground2'
+            'h-screen flex flex-col justify-center items-center text-white bg-subBackground2'
           }
         >
           {auth ? (
@@ -235,7 +255,7 @@ const App = () => {
                       selectedIndex === 0
                         ? 'bg-subBackground text-primary'
                         : 'hover:bg-input hover:text-white'
-                    } transition-all duration-250 ease-out`}
+                    } transition-all duration-250 ease-out outline-none`}
                   >
                     Auth & Contract Interact
                   </Tab>
@@ -244,7 +264,7 @@ const App = () => {
                       selectedIndex === 1
                         ? 'bg-subBackground text-primary'
                         : 'hover:bg-input hover:text-white'
-                    } transition-all duration-250 ease-out`}
+                    } transition-all duration-250 ease-out outline-none`}
                   >
                     Bulk Mint
                   </Tab>
@@ -557,27 +577,51 @@ const App = () => {
                       'h-full rounded-b-lg p-5 space-y-5 rounded-tl-lg bg-subBackground'
                     }
                   >
-                    <button
-                      onClick={bulkMintNFTs}
-                      className={
-                        'h-12 w-48 p-3 rounded-lg flex justify-center items-center space-x-3 text-black bg-primary transition-all duration-1000 ease-out'
-                      }
-                    >
-                      <FontAwesomeIcon icon={faSignature} />
-                      <p>Bulk Mint</p>
-                    </button>
-                    <div className="grid grid-cols-[repeat(auto-fill,minmax(105px,1fr))] gap-4 w-full">
+                    <div className="flex justify-start items-center space-x-5">
+                      <button
+                        onClick={bulkMintNFTs}
+                        className={
+                          'h-12 w-48 p-3 rounded-lg flex justify-center items-center space-x-3 text-black bg-primary transition-all duration-1000 ease-out'
+                        }
+                      >
+                        <p>Bulk Mint</p>
+                      </button>
+                      <button
+                        onClick={getMintInventories}
+                        className={
+                          'h-12 w-12 p-3 rounded-lg flex justify-center items-center space-x-3 text-black bg-[#222324] transition-all duration-1000 ease-out'
+                        }
+                      >
+                        <FontAwesomeIcon
+                          icon={faRotateRight}
+                          color="#FFC400"
+                          className={`${inventories.length === 0 ? 'animate-spin' : ''}`}
+                        />
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-[repeat(auto-fill,minmax(110px,1fr))] gap-4 w-full">
                       {inventories.map((inventory, index) => (
-                        <div key={index}>
-                          <div className="flex justify-center items-center p-3 bg-white border border-primary rounded-lg">
+                        <div
+                          className={`p-0.5 flex justify-center items-center bg-subBackground2 rounded-lg ${
+                            selectedItems.has(inventory.id)
+                              ? 'border-2 border-primary'
+                              : 'border-2 border-customGrayHeavy'
+                          }`}
+                        >
+                          <button
+                            key={index}
+                            className={`h-full w-full p-3 flex justify-center items-center bg-white rounded-md`}
+                            onClick={() => {
+                              toggleItem(inventory.id);
+                            }}
+                          >
                             <img
                               src={`${cdnUrls.maxi}/${inventory.itemDb.id}.png`}
                               loading="lazy"
                               alt="item"
                               className="h-20"
                             />
-                          </div>
-                          <p>{inventory.id}</p>
+                          </button>
                         </div>
                       ))}
                     </div>
