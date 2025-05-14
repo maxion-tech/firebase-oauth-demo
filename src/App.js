@@ -154,7 +154,7 @@ const App = () => {
 
   useEffect(() => {
     getMintInventories();
-  }, [token]);
+  }, [token]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
