@@ -159,6 +159,23 @@ const App = () => {
       .catch((error) => console.log('error: ', error.response.data));
   };
 
+  const refetchInventories = async () => {
+    await axios
+      .get(`${apiUrls.maxi}/mint-inventory`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'X-Server-Id': 1,
+        },
+      })
+      .then((res) => {
+        if (res?.data) {
+          const data = res.data.filter(Boolean);
+          setInventories(data);
+        }
+      })
+      .catch((error) => console.log('error: ', error.response.data));
+  };
+
   useEffect(() => {
     getMintInventories();
   }, [token]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -181,7 +198,7 @@ const App = () => {
             .then(async (res) => {
               console.log('🚀 res:', res);
               console.log(res?.data?.tx?.hash);
-              await getMintInventories();
+              await refetchInventories();
             });
           await sleep(2000);
         } catch (error) {
@@ -189,6 +206,7 @@ const App = () => {
           await sleep(4000);
         }
       }
+      setSelectedItems(new Set());
     }
   };
 
