@@ -266,8 +266,11 @@ const MarketplaceListingSection = ({
         <p>Selected {selectedNfts.size} NFTs</p>
 
         {/* Price Input */}
-        <div className="flex items-center space-x-2">
-          <FontAwesomeIcon icon={faDollarSign} className="text-primary" />
+        <div className="relative w-40">
+          <FontAwesomeIcon
+            icon={faDollarSign}
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-customGrayLight"
+          />
           <input
             type="number"
             value={listingPrice}
@@ -278,11 +281,19 @@ const MarketplaceListingSection = ({
                 setListingPrice(value);
               }
             }}
-            placeholder="Price per NFT"
+            placeholder="Price"
             min="3"
             step="1"
-            className="h-10 w-40 p-2 rounded-lg bg-[#222324] text-white outline-none border border-customGrayLight focus:border-primary [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            className="w-full h-10 pl-10 pr-10 bg-[#222324] border border-customGrayLight rounded-lg text-white placeholder-customGrayLight focus:outline-none focus:border-primary [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
           />
+          {listingPrice && (
+            <button
+              onClick={() => setListingPrice('')}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-customGrayLight hover:text-white transition-colors"
+            >
+              ×
+            </button>
+          )}
         </div>
 
         <div className="flex space-x-3">
