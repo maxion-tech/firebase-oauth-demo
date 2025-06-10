@@ -85,6 +85,7 @@ const App = () => {
     closeDialog: closeInventoryDialog,
     confirmDialog: inventoryConfirmDialog,
     closeConfirmDialog: closeInventoryConfirmDialog,
+    cancelMintingOperation,
   } = useInventoryOperations(token);
 
   const {
@@ -258,6 +259,7 @@ const App = () => {
                       onSelectAll={handleSelectAll}
                       onBulkMint={handleBulkMint}
                       onRefresh={getMintInventories}
+                      onCancelMintingOperation={cancelMintingOperation}
                     />
                   </TabPanel>
                   <TabPanel className="h-[calc(100vh-200px)] rounded-b-lg p-5 space-y-5 rounded-tl-lg bg-subBackground overflow-y-auto overflow-x-hidden">

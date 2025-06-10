@@ -14,6 +14,7 @@ const BulkMintSection = ({
   onSelectAll,
   onBulkMint,
   onRefresh,
+  onCancelMintingOperation,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -136,6 +137,13 @@ const BulkMintSection = ({
                   }}
                 ></div>
               </div>
+              <button
+                onClick={onCancelMintingOperation}
+                className="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition-colors"
+                title="Cancel operation"
+              >
+                Cancel
+              </button>
             </div>
           </div>
         )}

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { apiUrls } from '../config';
 
 export const useInventoryOperations = (token) => {
@@ -9,6 +9,9 @@ export const useInventoryOperations = (token) => {
   const [loadingProgress, setLoadingProgress] = useState({ current: 0, total: 0 });
   const [isMinting, setIsMinting] = useState(false);
   const [mintingProgress, setMintingProgress] = useState({ current: 0, total: 0 });
+
+  // Cancel minting operation state
+  const cancelMintingRef = useRef(false);
 
   // Dialog states
   const [dialog, setDialog] = useState({
@@ -54,6 +57,15 @@ export const useInventoryOperations = (token) => {
 
   const closeConfirmDialog = () => {
     setConfirmDialog((prev) => ({ ...prev, isOpen: false }));
+  };
+
+  // Cancel minting operation
+  const cancelMintingOperation = () => {
+    cancelMintingRef.current = true;
+  };
+
+  const resetMintingCancelState = () => {
+    cancelMintingRef.current = false;
   };
 
   const fetchInventories = async () => {
@@ -119,12 +131,18 @@ export const useInventoryOperations = (token) => {
       'Are you sure you want to mint all selected items in your inventory?',
       async () => {
         setIsMinting(true);
+        resetMintingCancelState();
         let processedCount = 0;
         let successCount = 0;
         let failCount = 0;
         const totalItems = selectedItems.size;
 
         for (const inventoryId of selectedItems) {
+          // Check if operation was cancelled
+          if (cancelMintingRef.current) {
+            break;
+          }
+
           try {
             setMintingProgress({ current: processedCount + 1, total: totalItems });
 
@@ -149,19 +167,26 @@ export const useInventoryOperations = (token) => {
           }
         }
 
+        const operationMessage = cancelMintingRef.current
+          ? `Minting cancelled! Processed: ${processedCount}/${totalItems}, Success: ${successCount}, Failed: ${failCount}`
+          : `Minting complete! Success: ${successCount}, Failed: ${failCount}`;
+
         showDialog(
-          successCount > 0 && failCount === 0
+          cancelMintingRef.current
+            ? 'warning'
+            : successCount > 0 && failCount === 0
             ? 'success'
             : failCount > 0
             ? 'warning'
             : 'info',
-          'Minting Complete',
-          `Minting complete! Success: ${successCount}, Failed: ${failCount}`,
+          cancelMintingRef.current ? 'Minting Cancelled' : 'Minting Complete',
+          operationMessage,
         );
 
         setSelectedItems(new Set());
         setIsMinting(false);
         setMintingProgress({ current: 0, total: 0 });
+        resetMintingCancelState();
       },
     );
   };
@@ -207,5 +232,7 @@ export const useInventoryOperations = (token) => {
     closeDialog,
     confirmDialog,
     closeConfirmDialog,
+    // Cancel minting operation
+    cancelMintingOperation,
   };
 };
