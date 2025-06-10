@@ -146,16 +146,16 @@ export const useInventoryOperations = (token) => {
           try {
             setMintingProgress({ current: processedCount + 1, total: totalItems });
 
-            await axios
-              .post(
-                `${apiUrls.maxi}/mint-inventory/mint`,
-                { mintInventoryId: inventoryId },
-                { headers: { Authorization: `Bearer ${token}`, 'X-Server-Id': 1 } },
-              )
-              .then(async () => {
-                await refetchInventoriesWithoutLoading();
-                successCount++;
-              });
+            const result = await axios.post(
+              `${apiUrls.maxi}/mint-inventory/mint`,
+              { mintInventoryId: inventoryId },
+              { headers: { Authorization: `Bearer ${token}`, 'X-Server-Id': 1 } },
+            );
+
+            if (result) {
+              await refetchInventoriesWithoutLoading();
+              successCount++;
+            }
 
             processedCount++;
             await sleep(2000);
