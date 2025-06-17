@@ -150,7 +150,7 @@ const TextFormatter = () => {
         </div>
 
         {/* Controls */}
-        <div className="flex flex-col items-center justify-center space-y-4 mx-4 min-w-[120px]">
+        <div className="flex flex-col items-center justify-start space-y-4 mt-10 mx-4 min-w-[120px]">
           <div className="flex items-center justify-between w-56 space-x-3">
             <span className="text-customGrayLight">Add Quotes</span>
             <button
@@ -283,17 +283,19 @@ const TextFormatter = () => {
             Clear
           </button>
 
-          <button
-            onClick={handleCopy}
-            disabled={!output.trim()}
-            className={`h-10 w-48 p-3 rounded-lg flex justify-center items-center space-x-3 ${
-              !output.trim()
-                ? 'text-white bg-[#3f3f3f] cursor-not-allowed'
-                : 'bg-primary hover:bg-primary/90 text-black'
-            } transition-all duration-300`}
-          >
-            Copy Output
-          </button>
+          {output.length > 0 && (
+            <button
+              onClick={handleCopy}
+              disabled={!output.trim()}
+              className={`h-10 w-48 p-3 rounded-lg flex justify-center items-center space-x-3 ${
+                !output.trim()
+                  ? 'text-white bg-[#3f3f3f] cursor-not-allowed'
+                  : 'bg-primary hover:bg-primary/90 text-black'
+              } transition-all duration-300`}
+            >
+              Copy Output
+            </button>
+          )}
         </div>
 
         {/* Right: Output area */}
