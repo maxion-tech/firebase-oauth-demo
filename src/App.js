@@ -13,6 +13,7 @@ import CustomDialog from './components/Dialog';
 import Header from './components/Header';
 import LoginSection from './components/LoginSection';
 import MarketplaceListingSection from './components/MarketplaceListingSection';
+import TextFormatter from './components/TextFormatter';
 import WalletConnection from './components/WalletConnection';
 import { chains, operators, providers } from './constants';
 import { useContractOperations } from './hooks/useContractOperations';
@@ -197,6 +198,15 @@ const App = () => {
                   >
                     Marketplace Listing
                   </Tab>
+                  <Tab
+                    className={`w-full flex justify-center items-center rounded-t-lg ${
+                      selectedIndex === 3
+                        ? 'bg-subBackground text-primary'
+                        : 'hover:bg-input hover:text-white'
+                    } transition-all duration-250 ease-out outline-none`}
+                  >
+                    Text Formatter
+                  </Tab>
                 </TabList>
                 <TabPanels className="h-[90%]">
                   <TabPanel className="h-full rounded-b-lg rounded-tr-lg bg-subBackground">
@@ -262,7 +272,7 @@ const App = () => {
                       onCancelMintingOperation={cancelMintingOperation}
                     />
                   </TabPanel>
-                  <TabPanel className="h-[calc(100vh-200px)] rounded-b-lg p-5 space-y-5 rounded-tl-lg bg-subBackground overflow-y-auto overflow-x-hidden">
+                  <TabPanel className="h-[calc(100vh-200px)] rounded-b-lg p-5 space-y-5 rounded-t-lg bg-subBackground overflow-y-auto overflow-x-hidden">
                     <MarketplaceListingSection
                       availableNfts={availableNfts}
                       allNfts={allNfts}
@@ -310,6 +320,9 @@ const App = () => {
                         }
                       }}
                     />
+                  </TabPanel>
+                  <TabPanel className="h-[calc(100vh-200px)] rounded-b-lg p-5 space-y-5 rounded-tl-lg bg-subBackground overflow-y-auto overflow-x-hidden">
+                    <TextFormatter />
                   </TabPanel>
                 </TabPanels>
               </TabGroup>
