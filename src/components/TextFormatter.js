@@ -61,6 +61,7 @@ const TextFormatter = () => {
   const [selectedBracket, setSelectedBracket] = useState(brackets[0]);
   const [isString, setIsString] = useState(false);
   const [removeDuplicates, setRemoveDuplicates] = useState(false);
+  const [convertToLines, setConvertToLines] = useState(false);
   const [showToast, setShowToast] = useState(false);
 
   const inputTextRef = useRef(null);
@@ -73,6 +74,12 @@ const TextFormatter = () => {
 
     if (removeDuplicates) {
       numbers = Array.from(new Set(numbers));
+    }
+
+    if (convertToLines) {
+      const joined = numbers.map((num) => (isString ? `"${num}"` : num)).join('\n');
+      setOutput(joined);
+      return;
     }
 
     const joined = numbers
@@ -178,6 +185,22 @@ const TextFormatter = () => {
               <span
                 className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
                   removeDuplicates ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              />
+            </button>
+          </div>
+
+          <div className="flex items-center justify-between w-56 space-x-3">
+            <span className="text-customGrayLight">Convert to Lines</span>
+            <button
+              onClick={() => setConvertToLines(!convertToLines)}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
+                convertToLines ? 'bg-primary' : 'bg-[#3f3f3f]'
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  convertToLines ? 'translate-x-6' : 'translate-x-1'
                 }`}
               />
             </button>
