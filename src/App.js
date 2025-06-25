@@ -16,6 +16,7 @@ import MarketplaceListingSection from './components/MarketplaceListingSection';
 import TextFormatter from './components/TextFormatter';
 import WalletConnection from './components/WalletConnection';
 import { chains, operators, providers } from './constants';
+import { DEFAULT_SERVER } from './constants/servers';
 import { useContractOperations } from './hooks/useContractOperations';
 import { useInventoryOperations } from './hooks/useInventoryOperations';
 import { useMarketplaceOperations } from './hooks/useMarketplaceOperations';
@@ -59,6 +60,7 @@ const App = () => {
   const [walletToken, setWalletToken] = useState();
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [allowanceAmount, setAllowanceAmount] = useState();
+  const [selectedServer, setSelectedServer] = useState(DEFAULT_SERVER);
 
   const { account, activateBrowserWallet, deactivate, library, switchNetwork } =
     useEthers();
@@ -87,7 +89,7 @@ const App = () => {
     confirmDialog: inventoryConfirmDialog,
     closeConfirmDialog: closeInventoryConfirmDialog,
     cancelMintingOperation,
-  } = useInventoryOperations(token);
+  } = useInventoryOperations(token, selectedServer);
 
   const {
     availableNfts,
@@ -270,6 +272,8 @@ const App = () => {
                       onBulkMint={handleBulkMint}
                       onRefresh={getMintInventories}
                       onCancelMintingOperation={cancelMintingOperation}
+                      selectedServer={selectedServer}
+                      onServerChange={setSelectedServer}
                     />
                   </TabPanel>
                   <TabPanel className="h-[calc(100vh-200px)] rounded-b-lg p-5 space-y-5 rounded-t-lg bg-subBackground overflow-y-auto overflow-x-hidden">

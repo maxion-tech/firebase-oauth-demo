@@ -1,8 +1,9 @@
 import axios from 'axios';
 import { useEffect, useRef, useState } from 'react';
 import { apiUrls } from '../config';
+import { DEFAULT_SERVER } from '../constants/servers';
 
-export const useInventoryOperations = (token) => {
+export const useInventoryOperations = (token, selectedServer = DEFAULT_SERVER) => {
   const [inventories, setInventories] = useState([]);
   const [selectedItems, setSelectedItems] = useState(new Set());
   const [isLoading, setIsLoading] = useState(false);
@@ -74,7 +75,7 @@ export const useInventoryOperations = (token) => {
     setLoadingProgress({ current: 1, total: 1 });
 
     const res = await axios
-      .get(`${apiUrls.maxi}/mint-inventory`, {
+      .get(`${apiUrls[selectedServer]}/mint-inventory`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'X-Server-Id': 1,
@@ -105,7 +106,7 @@ export const useInventoryOperations = (token) => {
     if (!token) return [];
 
     const res = await axios
-      .get(`${apiUrls.maxi}/mint-inventory`, {
+      .get(`${apiUrls[selectedServer]}/mint-inventory`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'X-Server-Id': 1,
@@ -147,7 +148,7 @@ export const useInventoryOperations = (token) => {
             setMintingProgress({ current: processedCount + 1, total: totalItems });
 
             const result = await axios.post(
-              `${apiUrls.maxi}/mint-inventory/mint`,
+              `${apiUrls[selectedServer]}/mint-inventory/mint`,
               { mintInventoryId: inventoryId },
               { headers: { Authorization: `Bearer ${token}`, 'X-Server-Id': 1 } },
             );
@@ -214,7 +215,7 @@ export const useInventoryOperations = (token) => {
 
   useEffect(() => {
     getMintInventories();
-  }, [token]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [token, selectedServer]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return {
     inventories,

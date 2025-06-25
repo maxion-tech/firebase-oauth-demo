@@ -107,7 +107,7 @@ export const useMarketplaceOperations = (walletToken, clearWeb3Token) => {
       setLoadingProgress({ current: 0, total: 1 });
 
       // Fetch first page to get total pages
-      const firstPageResponse = await axios.get(`${marketplaceApiUrls.maxi}/nft/wallet`, {
+      const firstPageResponse = await axios.get(`${marketplaceApiUrls.thai}/nft/wallet`, {
         headers: {
           Authorization: `Bearer ${walletToken}`,
         },
@@ -131,7 +131,7 @@ export const useMarketplaceOperations = (walletToken, clearWeb3Token) => {
         if (totalPages > 1) {
           for (let page = 2; page <= totalPages; page++) {
             try {
-              const response = await axios.get(`${marketplaceApiUrls.maxi}/nft/wallet`, {
+              const response = await axios.get(`${marketplaceApiUrls.thai}/nft/wallet`, {
                 headers: {
                   Authorization: `Bearer ${walletToken}`,
                 },
@@ -178,7 +178,7 @@ export const useMarketplaceOperations = (walletToken, clearWeb3Token) => {
     if (!walletToken) return [];
     try {
       const response = await axios.get(
-        `${marketplaceApiUrls.maxi}/market/my-market-list`,
+        `${marketplaceApiUrls.thai}/market/my-market-list`,
         {
           headers: {
             Authorization: `Bearer ${walletToken}`,
@@ -249,7 +249,7 @@ export const useMarketplaceOperations = (walletToken, clearWeb3Token) => {
   const listNftToMarketplace = async (nftId, price) => {
     try {
       await axios.post(
-        `${marketplaceApiUrls.maxi}/market/sell`,
+        `${marketplaceApiUrls.thai}/market/sell`,
         { nftId: nftId, price: parseFloat(price) },
         {
           headers: {
@@ -270,7 +270,7 @@ export const useMarketplaceOperations = (walletToken, clearWeb3Token) => {
   const cancelListing = async (marketId) => {
     try {
       await axios.post(
-        `${marketplaceApiUrls.maxi}/market/cancel`,
+        `${marketplaceApiUrls.thai}/market/cancel`,
         { marketId },
         {
           headers: {

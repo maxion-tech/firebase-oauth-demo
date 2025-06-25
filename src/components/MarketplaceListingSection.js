@@ -556,7 +556,7 @@ const MarketplaceListingSection = ({
                   title={nft.name || `NFT #${nft.id}`}
                 >
                   <img
-                    src={`${cdnUrls.maxi}/${nft.nft.nameid}.png`}
+                    src={`${cdnUrls.thai}/${nft.nft.nameid}.png`}
                     loading="lazy"
                     alt={nft.name || 'NFT'}
                     className="h-20"
