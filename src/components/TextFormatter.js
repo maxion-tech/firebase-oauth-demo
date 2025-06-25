@@ -7,7 +7,9 @@ import {
   ListboxOptions,
   Transition,
 } from '@headlessui/react';
+import { camelCase, capitalize, snakeCase } from 'lodash';
 import React, { Fragment, useRef, useState } from 'react';
+import { DEFAULT_TEXT_CASE, TEXT_CASE_OPTIONS, TEXT_CASES } from '../constants/textCases';
 
 const Toast = ({ message, isVisible }) => {
   return (
@@ -54,11 +56,20 @@ const brackets = [
   { value: 'curly', label: 'Curly Braces { }', symbols: ['{', '}'] },
 ];
 
+const tabs = [
+  { id: 'delimiters', label: 'Delimiters' },
+  { id: 'json', label: 'JSON to String' },
+];
+
 const TextFormatter = () => {
   const [input, setInput] = useState('');
   const [output, setOutput] = useState('');
+  const [selectedTab, setSelectedTab] = useState('delimiters');
   const [selectedSymbol, setSelectedSymbol] = useState(symbols[0]);
   const [selectedBracket, setSelectedBracket] = useState(brackets[0]);
+  const [selectedTextCase, setSelectedTextCase] = useState(
+    TEXT_CASE_OPTIONS.find((option) => option.value === DEFAULT_TEXT_CASE),
+  );
   const [isString, setIsString] = useState(false);
   const [removeDuplicates, setRemoveDuplicates] = useState(false);
   const [convertToLines, setConvertToLines] = useState(false);
@@ -69,12 +80,46 @@ const TextFormatter = () => {
   const outputTextRef = useRef(null);
   const outputLinesRef = useRef(null);
 
+  const isJsonMode = selectedTab === 'json';
+
+  const applyTextCase = (text) => {
+    switch (selectedTextCase.value) {
+      case TEXT_CASES.LOWERCASE:
+        return text.toLowerCase();
+      case TEXT_CASES.UPPERCASE:
+        return text.toUpperCase();
+      case TEXT_CASES.CAPITALIZE:
+        return capitalize(text);
+      case TEXT_CASES.SNAKE_CASE:
+        return snakeCase(text);
+      case TEXT_CASES.CAMEL_CASE:
+        return camelCase(text);
+      case TEXT_CASES.RESPECT_CASE:
+      default:
+        return text;
+    }
+  };
+
   const handleConvert = () => {
+    if (isJsonMode) {
+      try {
+        // Parse the input as JSON and then stringify it as a string literal with escaped quotes
+        const parsedJson = JSON.parse(input);
+        setOutput(JSON.stringify(JSON.stringify(parsedJson)));
+      } catch (error) {
+        setOutput('Error: Invalid JSON format');
+      }
+      return;
+    }
+
     let numbers = input.split(/\s+|,/).filter(Boolean);
 
     if (removeDuplicates) {
       numbers = Array.from(new Set(numbers));
     }
+
+    // Apply text case transformation to each number
+    numbers = numbers.map((num) => applyTextCase(num));
 
     if (convertToLines) {
       const joined = numbers.map((num) => (isString ? `"${num}"` : num)).join('\n');
@@ -140,7 +185,9 @@ const TextFormatter = () => {
             {input === '' && (
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <span className="text-customGrayLight text-center select-none">
-                  Enter (or paste) your column of data here
+                  {isJsonMode
+                    ? 'Enter (or paste) your JSON here'
+                    : 'Enter (or paste) your column of data here'}
                 </span>
               </div>
             )}
@@ -157,133 +204,195 @@ const TextFormatter = () => {
         </div>
 
         {/* Controls */}
-        <div className="flex flex-col items-center justify-start space-y-4 mt-10 mx-4 min-w-[120px]">
-          <div className="flex items-center justify-between w-56 space-x-3">
-            <span className="text-customGrayLight">Add Quotes</span>
-            <button
-              onClick={() => setIsString(!isString)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
-                isString ? 'bg-primary' : 'bg-[#3f3f3f]'
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  isString ? 'translate-x-6' : 'translate-x-1'
+        <div className="flex flex-col items-center justify-start space-y-4 mx-4 min-w-[120px]">
+          {/* Tab Menu */}
+          <div className="flex space-x-1 bg-[#3f3f3f] p-1 rounded-lg">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setSelectedTab(tab.id)}
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
+                  selectedTab === tab.id
+                    ? 'bg-primary text-black'
+                    : 'text-white hover:text-gray-200'
                 }`}
-              />
-            </button>
-          </div>
-
-          <div className="flex items-center justify-between w-56 space-x-3">
-            <span className="text-customGrayLight">Remove Duplicates</span>
-            <button
-              onClick={() => setRemoveDuplicates(!removeDuplicates)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
-                removeDuplicates ? 'bg-primary' : 'bg-[#3f3f3f]'
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  removeDuplicates ? 'translate-x-6' : 'translate-x-1'
-                }`}
-              />
-            </button>
-          </div>
-
-          <div className="flex items-center justify-between w-56 space-x-3">
-            <span className="text-customGrayLight">Convert to Lines</span>
-            <button
-              onClick={() => setConvertToLines(!convertToLines)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
-                convertToLines ? 'bg-primary' : 'bg-[#3f3f3f]'
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  convertToLines ? 'translate-x-6' : 'translate-x-1'
-                }`}
-              />
-            </button>
-          </div>
-
-          <Listbox value={selectedSymbol} onChange={setSelectedSymbol}>
-            <div className="relative w-56">
-              <ListboxButton className="h-12 w-56 flex justify-between items-center p-3 px-5 cursor-pointer rounded-xl border border-buttonBorder bg-subBackground text-white">
-                <span className="block truncate">{selectedSymbol.label}</span>
-                <FontAwesomeIcon icon={faChevronDown} />
-              </ListboxButton>
-              <Transition
-                as={Fragment}
-                leave="transition ease-in duration-100"
-                leaveFrom="opacity-100"
-                leaveTo="opacity-0"
               >
-                <ListboxOptions className="absolute mt-2 w-56 overflow-auto rounded-lg border border-buttonBorder bg-subBackground text-white shadow-[#222325] shadow-md z-10">
-                  {symbols.map((symbol) => (
-                    <ListboxOption
-                      key={symbol.value}
-                      className={({ active }) =>
-                        `relative cursor-default select-none p-3 px-5 ${
-                          active ? 'bg-[#222325] text-white' : 'text-white'
-                        }`
-                      }
-                      value={symbol}
-                    >
-                      {({ selected }) => (
-                        <span
-                          className={`block truncate ${
-                            selected ? 'font-medium' : 'font-normal'
-                          }`}
-                        >
-                          {symbol.label}
-                        </span>
-                      )}
-                    </ListboxOption>
-                  ))}
-                </ListboxOptions>
-              </Transition>
-            </div>
-          </Listbox>
+                {tab.label}
+              </button>
+            ))}
+          </div>
 
-          <Listbox value={selectedBracket} onChange={setSelectedBracket}>
-            <div className="relative w-56">
-              <ListboxButton className="h-12 w-56 flex justify-between items-center p-3 px-5 cursor-pointer rounded-xl border border-buttonBorder bg-subBackground text-white">
-                <span className="block truncate">{selectedBracket.label}</span>
-                <FontAwesomeIcon icon={faChevronDown} />
-              </ListboxButton>
-              <Transition
-                as={Fragment}
-                leave="transition ease-in duration-100"
-                leaveFrom="opacity-100"
-                leaveTo="opacity-0"
-              >
-                <ListboxOptions className="absolute mt-2 w-56 overflow-auto rounded-lg border border-buttonBorder bg-subBackground text-white shadow-[#222325] shadow-md z-10">
-                  {brackets.map((bracket) => (
-                    <ListboxOption
-                      key={bracket.value}
-                      className={({ active }) =>
-                        `relative cursor-default select-none p-3 px-5 ${
-                          active ? 'bg-[#222325] text-white' : 'text-white'
-                        }`
-                      }
-                      value={bracket}
-                    >
-                      {({ selected }) => (
-                        <span
-                          className={`block truncate ${
-                            selected ? 'font-medium' : 'font-normal'
-                          }`}
+          {/* Delimiters Mode Controls */}
+          {!isJsonMode && (
+            <>
+              <Listbox value={selectedSymbol} onChange={setSelectedSymbol}>
+                <div className="relative w-56">
+                  <ListboxButton className="h-10 w-56 flex justify-between items-center p-3 px-5 cursor-pointer rounded-lg border border-buttonBorder bg-subBackground text-white">
+                    <span className="block truncate">{selectedSymbol.label}</span>
+                    <FontAwesomeIcon icon={faChevronDown} />
+                  </ListboxButton>
+                  <Transition
+                    as={Fragment}
+                    leave="transition ease-in duration-100"
+                    leaveFrom="opacity-100"
+                    leaveTo="opacity-0"
+                  >
+                    <ListboxOptions className="absolute mt-2 w-56 overflow-auto rounded-lg border border-buttonBorder bg-subBackground text-white shadow-[#222325] shadow-md z-10">
+                      {symbols.map((symbol) => (
+                        <ListboxOption
+                          key={symbol.value}
+                          className={({ active }) =>
+                            `relative cursor-default select-none p-2.5 px-5 ${
+                              active ? 'bg-[#222325] text-white' : 'text-white'
+                            }`
+                          }
+                          value={symbol}
                         >
-                          {bracket.label}
-                        </span>
-                      )}
-                    </ListboxOption>
-                  ))}
-                </ListboxOptions>
-              </Transition>
-            </div>
-          </Listbox>
+                          {({ selected }) => (
+                            <span
+                              className={`block truncate ${
+                                selected ? 'font-medium' : 'font-normal'
+                              }`}
+                            >
+                              {symbol.label}
+                            </span>
+                          )}
+                        </ListboxOption>
+                      ))}
+                    </ListboxOptions>
+                  </Transition>
+                </div>
+              </Listbox>
 
+              <Listbox value={selectedBracket} onChange={setSelectedBracket}>
+                <div className="relative w-56">
+                  <ListboxButton className="h-10 w-56 flex justify-between items-center p-3 px-5 cursor-pointer rounded-lg border border-buttonBorder bg-subBackground text-white">
+                    <span className="block truncate">{selectedBracket.label}</span>
+                    <FontAwesomeIcon icon={faChevronDown} />
+                  </ListboxButton>
+                  <Transition
+                    as={Fragment}
+                    leave="transition ease-in duration-100"
+                    leaveFrom="opacity-100"
+                    leaveTo="opacity-0"
+                  >
+                    <ListboxOptions className="absolute mt-2 w-56 overflow-auto rounded-lg border border-buttonBorder bg-subBackground text-white shadow-[#222325] shadow-md z-10">
+                      {brackets.map((bracket) => (
+                        <ListboxOption
+                          key={bracket.value}
+                          className={({ active }) =>
+                            `relative cursor-default select-none p-2.5 px-5 ${
+                              active ? 'bg-[#222325] text-white' : 'text-white'
+                            }`
+                          }
+                          value={bracket}
+                        >
+                          {({ selected }) => (
+                            <span
+                              className={`block truncate ${
+                                selected ? 'font-medium' : 'font-normal'
+                              }`}
+                            >
+                              {bracket.label}
+                            </span>
+                          )}
+                        </ListboxOption>
+                      ))}
+                    </ListboxOptions>
+                  </Transition>
+                </div>
+              </Listbox>
+
+              <Listbox value={selectedTextCase} onChange={setSelectedTextCase}>
+                <div className="relative w-56">
+                  <ListboxButton className="h-10 w-56 flex justify-between items-center p-3 px-5 cursor-pointer rounded-lg border border-buttonBorder bg-subBackground text-white">
+                    <span className="block truncate">{selectedTextCase.label}</span>
+                    <FontAwesomeIcon icon={faChevronDown} />
+                  </ListboxButton>
+                  <Transition
+                    as={Fragment}
+                    leave="transition ease-in duration-100"
+                    leaveFrom="opacity-100"
+                    leaveTo="opacity-0"
+                  >
+                    <ListboxOptions className="absolute mt-2 w-56 overflow-auto rounded-lg border border-buttonBorder bg-subBackground text-white shadow-[#222325] shadow-md z-10">
+                      {TEXT_CASE_OPTIONS.map((textCase) => (
+                        <ListboxOption
+                          key={textCase.value}
+                          className={({ active }) =>
+                            `relative cursor-default select-none p-2.5 px-5 ${
+                              active ? 'bg-[#222325] text-white' : 'text-white'
+                            }`
+                          }
+                          value={textCase}
+                        >
+                          {({ selected }) => (
+                            <span
+                              className={`block truncate ${
+                                selected ? 'font-medium' : 'font-normal'
+                              }`}
+                            >
+                              {textCase.label}
+                            </span>
+                          )}
+                        </ListboxOption>
+                      ))}
+                    </ListboxOptions>
+                  </Transition>
+                </div>
+              </Listbox>
+
+              <div className="flex items-center justify-between w-56 space-x-3">
+                <span className="text-customGrayLight">Add Quotes</span>
+                <button
+                  onClick={() => setIsString(!isString)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
+                    isString ? 'bg-primary' : 'bg-[#3f3f3f]'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      isString ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between w-56 space-x-3">
+                <span className="text-customGrayLight">Remove Duplicates</span>
+                <button
+                  onClick={() => setRemoveDuplicates(!removeDuplicates)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
+                    removeDuplicates ? 'bg-primary' : 'bg-[#3f3f3f]'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      removeDuplicates ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between w-56 space-x-3">
+                <span className="text-customGrayLight">Convert to Lines</span>
+                <button
+                  onClick={() => setConvertToLines(!convertToLines)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
+                    convertToLines ? 'bg-primary' : 'bg-[#3f3f3f]'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      convertToLines ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
+            </>
+          )}
+
+          {/* Action Buttons */}
           <button
             onClick={handleConvert}
             disabled={!input.trim()}
@@ -313,7 +422,7 @@ const TextFormatter = () => {
               className={`h-10 w-48 p-3 rounded-lg flex justify-center items-center space-x-3 ${
                 !output.trim()
                   ? 'text-white bg-[#3f3f3f] cursor-not-allowed'
-                  : 'bg-primary hover:bg-primary/90 text-black'
+                  : 'bg-green-600 hover:bg-green-700 text-white'
               } transition-all duration-300`}
             >
               Copy Output
@@ -342,7 +451,9 @@ const TextFormatter = () => {
             {output === '' && (
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <span className="text-customGrayLight text-center select-none">
-                  Your converted list will appear here
+                  {isJsonMode
+                    ? 'Your JSON string will appear here'
+                    : 'Your converted list will appear here'}
                 </span>
               </div>
             )}
