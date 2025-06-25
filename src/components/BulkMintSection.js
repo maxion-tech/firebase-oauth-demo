@@ -1,7 +1,20 @@
-import { faCheck, faRotateRight, faSearch } from '@fortawesome/free-solid-svg-icons';
+import {
+  faCheck,
+  faChevronDown,
+  faRotateRight,
+  faSearch,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useState } from 'react';
+import {
+  Listbox,
+  ListboxButton,
+  ListboxOption,
+  ListboxOptions,
+  Transition,
+} from '@headlessui/react';
+import React, { Fragment, useState } from 'react';
 import { cdnUrls } from '../config';
+import { SERVER_OPTIONS } from '../constants/servers';
 
 const BulkMintSection = ({
   inventories,
@@ -15,8 +28,13 @@ const BulkMintSection = ({
   onBulkMint,
   onRefresh,
   onCancelMintingOperation,
+  selectedServer,
+  onServerChange,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
+
+  const currentServer =
+    SERVER_OPTIONS.find((server) => server.value === selectedServer) || SERVER_OPTIONS[0];
 
   // Filter inventories based on search term
   const getFilteredInventories = () => {
@@ -39,7 +57,7 @@ const BulkMintSection = ({
     <div className="flex flex-col h-full">
       {/* Search Input */}
       <div className="mb-4">
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center justify-between space-x-3">
           <div className="relative w-80">
             <FontAwesomeIcon
               icon={faSearch}
@@ -61,6 +79,48 @@ const BulkMintSection = ({
               </button>
             )}
           </div>
+
+          <Listbox
+            value={currentServer}
+            onChange={(server) => onServerChange(server.value)}
+          >
+            <div className="relative w-40">
+              <ListboxButton className="h-10 w-40 flex justify-between items-center p-3 px-5 cursor-pointer rounded-lg border border-buttonBorder bg-subBackground text-white">
+                <span className="block truncate">{currentServer.label}</span>
+                <FontAwesomeIcon icon={faChevronDown} />
+              </ListboxButton>
+              <Transition
+                as={Fragment}
+                leave="transition ease-in duration-100"
+                leaveFrom="opacity-100"
+                leaveTo="opacity-0"
+              >
+                <ListboxOptions className="absolute mt-2 w-40 overflow-auto rounded-lg border border-buttonBorder bg-subBackground text-white shadow-[#222325] shadow-md z-10">
+                  {SERVER_OPTIONS.map((server) => (
+                    <ListboxOption
+                      key={server.value}
+                      className={({ active }) =>
+                        `relative cursor-default select-none p-2.5 px-5 ${
+                          active ? 'bg-[#222325] text-white' : 'text-white'
+                        }`
+                      }
+                      value={server}
+                    >
+                      {({ selected }) => (
+                        <span
+                          className={`block truncate ${
+                            selected ? 'font-medium' : 'font-normal'
+                          }`}
+                        >
+                          {server.label}
+                        </span>
+                      )}
+                    </ListboxOption>
+                  ))}
+                </ListboxOptions>
+              </Transition>
+            </div>
+          </Listbox>
         </div>
       </div>
 
@@ -214,7 +274,7 @@ const BulkMintSection = ({
                   onClick={() => onSelectItem(inventory.id)}
                 >
                   <img
-                    src={`${cdnUrls.maxi}/${inventory.itemDb.id}.png`}
+                    src={`${cdnUrls[selectedServer]}/${inventory.itemDb.id}.png`}
                     loading="lazy"
                     alt="item"
                     className="h-20"
