@@ -13,18 +13,22 @@ const AuthSection = ({
   setAuth,
 }) => {
   return (
-    <div className="space-y-3 p-3">
-      <GetUser
-        token={token}
-        refreshToken={refreshToken}
-        provider={provider}
-        copyToken={copyToken}
-        setCopyToken={setCopyToken}
-        copyRefreshToken={copyRefreshToken}
-        setCopyRefreshToken={setCopyRefreshToken}
-      />
-      <SignOutButton setAuth={setAuth} firebaseApp={provider.firebaseApp} />
-      <div className="h-80 w-full flex items-center justify-center">
+    <div className="flex flex-col items-center w-full h-full">
+      <div className="w-full">
+        <GetUser
+          token={token}
+          refreshToken={refreshToken}
+          provider={provider}
+          copyToken={copyToken}
+          setCopyToken={setCopyToken}
+          copyRefreshToken={copyRefreshToken}
+          setCopyRefreshToken={setCopyRefreshToken}
+        />
+      </div>
+      <div className="w-full mt-4">
+        <SignOutButton setAuth={setAuth} firebaseApp={provider.firebaseApp} />
+      </div>
+      <div className="flex-1 flex items-center justify-center w-full mt-6">
         <div className="box">
           <div className="loader"></div>
         </div>

@@ -52,7 +52,7 @@ const WalletConnection = ({
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 w-full">
       <div className="flex justify-center items-center bg-gray-300 text-black rounded-md">
         <p>Web3 Wallet</p>
       </div>

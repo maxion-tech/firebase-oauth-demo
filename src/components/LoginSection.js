@@ -20,7 +20,7 @@ const LoginSection = ({
   setRefreshToken,
 }) => {
   return (
-    <div className="h-full w-1/2 flex flex-col space-y-5 items-center justify-center">
+    <div className="h-full w-full flex flex-col space-y-5 items-center justify-center">
       <div className="h-1/2 space-y-7 p-10 rounded-3xl bg-subBackground">
         <div className="flex items-center space-x-5">
           <img src="https://account.maxion.gg/images/icons/Vector.svg" alt="maxion" />

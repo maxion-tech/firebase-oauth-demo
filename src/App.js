@@ -1,4 +1,3 @@
-import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import { Alert } from '@mui/material';
 import { BSCTestnet, DAppProvider, useConnector, useEthers } from '@usedapp/core';
 import React, { useEffect, useState } from 'react';
@@ -10,10 +9,10 @@ import ChainSelector from './components/ChainSelector';
 import ConfirmDialog from './components/ConfirmDialog';
 import ContractInteractions from './components/ContractInteractions';
 import CustomDialog from './components/Dialog';
-import Header from './components/Header';
 import LoginSection from './components/LoginSection';
 import MarketplaceListingSection from './components/MarketplaceListingSection';
-import TextFormatter from './components/TextFormatter';
+import Sidebar from './components/Sidebar';
+import TextFormatterTab from './components/TextFormatterTab';
 import WalletConnection from './components/WalletConnection';
 import { chains, operators, providers } from './constants';
 import { DEFAULT_SERVER } from './constants/servers';
@@ -162,57 +161,22 @@ const App = () => {
         setProvider={setProvider}
         firebaseApp={provider.firebaseApp}
       />
-      <div className="relative">
-        <div className="h-screen flex flex-col justify-center items-center text-white bg-subBackground2">
-          {auth ? (
-            <>
-              <Header />
-              <TabGroup
-                className="h-full w-full p-5"
-                selectedIndex={selectedIndex}
-                onChange={setSelectedIndex}
-              >
-                <TabList className="h-12 flex justify-between">
-                  <Tab
-                    className={`w-full flex justify-center items-center rounded-t-lg ${
-                      selectedIndex === 0
-                        ? 'bg-subBackground text-primary'
-                        : 'hover:bg-input hover:text-white'
-                    } transition-all duration-250 ease-out outline-none`}
-                  >
-                    Auth & Contract Interact
-                  </Tab>
-                  <Tab
-                    className={`w-full flex justify-center items-center rounded-t-lg ${
-                      selectedIndex === 1
-                        ? 'bg-subBackground text-primary'
-                        : 'hover:bg-input hover:text-white'
-                    } transition-all duration-250 ease-out outline-none`}
-                  >
-                    Bulk Mint
-                  </Tab>
-                  <Tab
-                    className={`w-full flex justify-center items-center rounded-t-lg ${
-                      selectedIndex === 2
-                        ? 'bg-subBackground text-primary'
-                        : 'hover:bg-input hover:text-white'
-                    } transition-all duration-250 ease-out outline-none`}
-                  >
-                    Marketplace Listing
-                  </Tab>
-                  <Tab
-                    className={`w-full flex justify-center items-center rounded-t-lg ${
-                      selectedIndex === 3
-                        ? 'bg-subBackground text-primary'
-                        : 'hover:bg-input hover:text-white'
-                    } transition-all duration-250 ease-out outline-none`}
-                  >
-                    Text Formatter
-                  </Tab>
-                </TabList>
-                <TabPanels className="h-[90%]">
-                  <TabPanel className="h-full rounded-b-lg rounded-tr-lg bg-subBackground">
-                    <div className="grid grid-cols-2">
+      <div className="flex h-screen w-full bg-subBackground2 overflow-hidden">
+        {/* Sidebar */}
+        <Sidebar
+          selectedIndex={selectedIndex}
+          setSelectedIndex={setSelectedIndex}
+          isAuthenticated={auth}
+        />
+        {/* Main Content Area */}
+        <div className="flex-1 flex flex-col h-full min-h-0">
+          {/* Main Content */}
+          <div className="flex-1 flex flex-col text-white p-6 min-h-0 min-w-0 h-full">
+            {auth ? (
+              <div className="w-full h-full flex flex-col gap-8">
+                {selectedIndex === 0 && (
+                  <div className="flex items-center justify-center h-full w-full">
+                    <div className="h-full w-full flex items-center justify-center bg-subBackground rounded-lg shadow-lg p-6">
                       <AuthSection
                         token={token}
                         refreshToken={refreshToken}
@@ -223,43 +187,49 @@ const App = () => {
                         setCopyRefreshToken={setCopyRefreshToken}
                         setAuth={setAuth}
                       />
-                      <div className="space-y-10 p-3">
-                        <WalletConnection
-                          account={account}
-                          activateBrowserWallet={activateBrowserWallet}
-                          deactivate={deactivate}
-                          library={library}
-                          connector={connector}
-                          copyAddress={copyAddress}
-                          setCopyAddress={setCopyAddress}
-                          walletToken={walletToken}
-                          setWalletToken={setWalletToken}
-                          copyWalletToken={copyWalletToken}
-                          setCopyWalletToken={setCopyWalletToken}
-                        />
-                        {account && (
-                          <div className="w-full space-y-5 rounded-lg bg-subBackground">
-                            <ChainSelector
-                              chain={chain}
-                              setChain={setChain}
-                              chains={chains}
-                              operator={operator}
-                              setOperator={setOperator}
-                              operators={operators}
-                            />
-                            <ContractInteractions
-                              operator={operator}
-                              allowanceAmount={allowanceAmount}
-                              setAllowanceAmount={setAllowanceAmount}
-                              onApproveNFTs={onApproveNFTs}
-                              onAllowanceION={onAllowanceION}
-                            />
-                          </div>
-                        )}
-                      </div>
                     </div>
-                  </TabPanel>
-                  <TabPanel className="h-[calc(100vh-200px)] rounded-b-lg p-5 space-y-5 rounded-t-lg bg-subBackground overflow-y-auto overflow-x-hidden">
+                  </div>
+                )}
+                {selectedIndex === 1 && (
+                  <div className="flex items-center justify-center h-full w-full">
+                    <div className="h-full w-full flex flex-col items-center bg-subBackground rounded-lg shadow-lg p-6">
+                      <WalletConnection
+                        account={account}
+                        activateBrowserWallet={activateBrowserWallet}
+                        deactivate={deactivate}
+                        library={library}
+                        connector={connector}
+                        copyAddress={copyAddress}
+                        setCopyAddress={setCopyAddress}
+                        walletToken={walletToken}
+                        setWalletToken={setWalletToken}
+                        copyWalletToken={copyWalletToken}
+                        setCopyWalletToken={setCopyWalletToken}
+                      />
+                      {account && (
+                        <div className="w-full space-y-5 mt-6">
+                          <ChainSelector
+                            chain={chain}
+                            setChain={setChain}
+                            chains={chains}
+                            operator={operator}
+                            setOperator={setOperator}
+                            operators={operators}
+                          />
+                          <ContractInteractions
+                            operator={operator}
+                            allowanceAmount={allowanceAmount}
+                            setAllowanceAmount={setAllowanceAmount}
+                            onApproveNFTs={onApproveNFTs}
+                            onAllowanceION={onAllowanceION}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+                {selectedIndex === 2 && (
+                  <div className="rounded-lg bg-subBackground p-6 shadow-md h-full">
                     <BulkMintSection
                       inventories={inventories}
                       selectedItems={selectedItems}
@@ -275,8 +245,10 @@ const App = () => {
                       selectedServer={selectedServer}
                       onServerChange={setSelectedServer}
                     />
-                  </TabPanel>
-                  <TabPanel className="h-[calc(100vh-200px)] rounded-b-lg p-5 space-y-5 rounded-t-lg bg-subBackground overflow-y-auto overflow-x-hidden">
+                  </div>
+                )}
+                {selectedIndex === 3 && (
+                  <div className="rounded-lg bg-subBackground p-6 shadow-md h-full">
                     <MarketplaceListingSection
                       availableNfts={availableNfts}
                       allNfts={allNfts}
@@ -324,79 +296,91 @@ const App = () => {
                         }
                       }}
                     />
-                  </TabPanel>
-                  <TabPanel className="h-[calc(100vh-200px)] rounded-b-lg p-5 space-y-5 rounded-tl-lg bg-subBackground overflow-y-auto overflow-x-hidden">
-                    <TextFormatter />
-                  </TabPanel>
-                </TabPanels>
-              </TabGroup>
-            </>
-          ) : (
-            <LoginSection
-              provider={provider}
-              setProvider={setProvider}
-              providers={providers}
-              setAuth={setAuth}
-              setToken={setToken}
-              setRefreshToken={setRefreshToken}
-            />
-          )}
+                  </div>
+                )}
+                {selectedIndex === 4 && (
+                  <div className="rounded-lg bg-subBackground p-6 shadow-md h-full">
+                    <TextFormatterTab mode="delimiters" />
+                  </div>
+                )}
+                {selectedIndex === 5 && (
+                  <div className="rounded-lg bg-subBackground p-6 shadow-md h-full">
+                    <TextFormatterTab mode="json" />
+                  </div>
+                )}
+                {selectedIndex === 6 && (
+                  <div className="rounded-lg bg-subBackground p-6 shadow-md h-full">
+                    <TextFormatterTab mode="env" />
+                  </div>
+                )}
+              </div>
+            ) : (
+              <LoginSection
+                provider={provider}
+                setProvider={setProvider}
+                providers={providers}
+                setAuth={setAuth}
+                setToken={setToken}
+                setRefreshToken={setRefreshToken}
+              />
+            )}
+          </div>
         </div>
-        {(copyAddress || copyToken || copyRefreshToken || copyWalletToken) && (
-          <Alert
-            icon={false}
-            sx={{ backgroundColor: '#282a36', color: '#FFC400' }}
-            className="absolute bottom-10 right-10 bg-[#282a36] text-primary"
-          >
-            Copied to clipboard
-          </Alert>
-        )}
-
-        {/* Dialog Components */}
-        <CustomDialog
-          isOpen={inventoryDialog.isOpen}
-          onClose={closeInventoryDialog}
-          title={inventoryDialog.title}
-          message={inventoryDialog.message}
-          type={inventoryDialog.type}
-          onConfirm={inventoryDialog.onConfirm}
-        />
-
-        <ConfirmDialog
-          isOpen={inventoryConfirmDialog.isOpen}
-          onClose={closeInventoryConfirmDialog}
-          title={inventoryConfirmDialog.title}
-          message={inventoryConfirmDialog.message}
-          type={inventoryConfirmDialog.type}
-          onConfirm={inventoryConfirmDialog.onConfirm}
-        />
-
-        <CustomDialog
-          isOpen={marketplaceDialog.isOpen}
-          onClose={closeMarketplaceDialog}
-          title={marketplaceDialog.title}
-          message={marketplaceDialog.message}
-          type={marketplaceDialog.type}
-          onConfirm={marketplaceDialog.onConfirm}
-        />
-
-        <ConfirmDialog
-          isOpen={marketplaceConfirmDialog.isOpen}
-          onClose={closeMarketplaceConfirmDialog}
-          title={marketplaceConfirmDialog.title}
-          message={marketplaceConfirmDialog.message}
-          type={marketplaceConfirmDialog.type}
-          onConfirm={marketplaceConfirmDialog.onConfirm}
-        />
-
-        <CustomDialog
-          isOpen={signMessageDialog.isOpen}
-          onClose={closeSignMessageDialog}
-          title={signMessageDialog.title}
-          message={signMessageDialog.message}
-          type={signMessageDialog.type}
-        />
       </div>
+      {(copyAddress || copyToken || copyRefreshToken || copyWalletToken) && (
+        <Alert
+          icon={false}
+          sx={{ backgroundColor: '#282a36', color: '#FFC400' }}
+          className="absolute bottom-10 right-10 bg-[#282a36] text-primary"
+        >
+          Copied to clipboard
+        </Alert>
+      )}
+
+      {/* Dialog Components */}
+      <CustomDialog
+        isOpen={inventoryDialog.isOpen}
+        onClose={closeInventoryDialog}
+        title={inventoryDialog.title}
+        message={inventoryDialog.message}
+        type={inventoryDialog.type}
+        onConfirm={inventoryDialog.onConfirm}
+      />
+
+      <ConfirmDialog
+        isOpen={inventoryConfirmDialog.isOpen}
+        onClose={closeInventoryConfirmDialog}
+        title={inventoryConfirmDialog.title}
+        message={inventoryConfirmDialog.message}
+        type={inventoryConfirmDialog.type}
+        onConfirm={inventoryConfirmDialog.onConfirm}
+      />
+
+      <CustomDialog
+        isOpen={marketplaceDialog.isOpen}
+        onClose={closeMarketplaceDialog}
+        title={marketplaceDialog.title}
+        message={marketplaceDialog.message}
+        type={marketplaceDialog.type}
+        onConfirm={marketplaceDialog.onConfirm}
+      />
+
+      <ConfirmDialog
+        isOpen={marketplaceConfirmDialog.isOpen}
+        onClose={closeMarketplaceConfirmDialog}
+        title={marketplaceConfirmDialog.title}
+        message={marketplaceConfirmDialog.message}
+        type={marketplaceConfirmDialog.type}
+        onConfirm={marketplaceConfirmDialog.onConfirm}
+      />
+
+      <CustomDialog
+        isOpen={signMessageDialog.isOpen}
+        onClose={closeSignMessageDialog}
+        title={signMessageDialog.title}
+        message={signMessageDialog.message}
+        type={signMessageDialog.type}
+      />
     </DAppProvider>
   );
 };

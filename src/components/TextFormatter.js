@@ -59,6 +59,7 @@ const brackets = [
 const tabs = [
   { id: 'delimiters', label: 'Delimiters' },
   { id: 'json', label: 'JSON to String' },
+  { id: 'env', label: 'ENV Converter' },
 ];
 
 const TextFormatter = () => {
@@ -81,6 +82,7 @@ const TextFormatter = () => {
   const outputLinesRef = useRef(null);
 
   const isJsonMode = selectedTab === 'json';
+  const isEnvMode = selectedTab === 'env';
 
   const applyTextCase = (text) => {
     switch (selectedTextCase.value) {
@@ -108,6 +110,70 @@ const TextFormatter = () => {
         setOutput(JSON.stringify(JSON.stringify(parsedJson)));
       } catch (error) {
         setOutput('Error: Invalid JSON format');
+      }
+      return;
+    }
+
+    if (isEnvMode) {
+      try {
+        // Check if input looks like JSON or ENV format
+        const trimmedInput = input.trim();
+        if (trimmedInput.startsWith('{') || trimmedInput.startsWith('[')) {
+          // Convert JSON to ENV
+          const parsedJson = JSON.parse(trimmedInput);
+          const envLines = [];
+
+          const processObject = (obj, prefix = '') => {
+            Object.entries(obj).forEach(([key, value]) => {
+              // Remove spaces from key
+              const cleanKey = key.replace(/\s+/g, '');
+              const envKey = prefix
+                ? `${prefix}_${cleanKey.toUpperCase()}`
+                : cleanKey.toUpperCase();
+
+              if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+                processObject(value, envKey);
+              } else if (Array.isArray(value)) {
+                envLines.push(`${envKey}=${JSON.stringify(value)}`);
+              } else {
+                envLines.push(`${envKey}=${value}`);
+              }
+            });
+          };
+
+          processObject(parsedJson);
+          setOutput(envLines.join('\n'));
+        } else {
+          // Convert ENV to JSON
+          const lines = trimmedInput
+            .split('\n')
+            .filter((line) => line.trim() && line.includes('='));
+          const result = {};
+
+          lines.forEach((line) => {
+            const [key, ...valueParts] = line.split('=');
+            const value = valueParts.join('=').trim();
+
+            // Remove spaces from key and value
+            const cleanKey = key.trim().replace(/\s+/g, '');
+            const cleanValue = value.replace(/\s+/g, '');
+
+            // Try to parse as JSON, otherwise use as string
+            let parsedValue;
+            try {
+              parsedValue = JSON.parse(cleanValue);
+            } catch {
+              parsedValue = cleanValue;
+            }
+
+            // Use the key as-is without splitting or nesting
+            result[cleanKey] = parsedValue;
+          });
+
+          setOutput(JSON.stringify(result, null, 2));
+        }
+      } catch (error) {
+        setOutput('Error: Invalid format. Please check your input.');
       }
       return;
     }
@@ -187,6 +253,8 @@ const TextFormatter = () => {
                 <span className="text-customGrayLight text-center select-none">
                   {isJsonMode
                     ? 'Enter (or paste) your JSON here'
+                    : isEnvMode
+                    ? 'Enter JSON or ENV format here'
                     : 'Enter (or paste) your column of data here'}
                 </span>
               </div>
@@ -223,7 +291,7 @@ const TextFormatter = () => {
           </div>
 
           {/* Delimiters Mode Controls */}
-          {!isJsonMode && (
+          {!isJsonMode && !isEnvMode && (
             <>
               <Listbox value={selectedSymbol} onChange={setSelectedSymbol}>
                 <div className="relative w-56">
@@ -453,6 +521,8 @@ const TextFormatter = () => {
                 <span className="text-customGrayLight text-center select-none">
                   {isJsonMode
                     ? 'Your JSON string will appear here'
+                    : isEnvMode
+                    ? 'Your converted format will appear here'
                     : 'Your converted list will appear here'}
                 </span>
               </div>
