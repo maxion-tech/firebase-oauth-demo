@@ -11,6 +11,7 @@ const AuthSection = ({
   copyRefreshToken,
   setCopyRefreshToken,
   setAuth,
+  email,
 }) => {
   return (
     <div className="flex flex-col items-center w-full h-full">
@@ -23,6 +24,7 @@ const AuthSection = ({
           setCopyToken={setCopyToken}
           copyRefreshToken={copyRefreshToken}
           setCopyRefreshToken={setCopyRefreshToken}
+          email={email}
         />
       </div>
       <div className="w-full mt-4">

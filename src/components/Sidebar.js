@@ -137,17 +137,24 @@ const tabs = [
  * @param {function} props.setSelectedIndex
  * @param {boolean} props.isAuthenticated
  */
-const Sidebar = ({ selectedIndex, setSelectedIndex, isAuthenticated }) => {
+const Sidebar = ({ selectedIndex, setSelectedIndex, isAuthenticated, email }) => {
   return (
     <aside className="h-full w-64 bg-[#23242a] flex flex-col justify-between py-8 px-4 shadow-lg rounded-r-2xl">
       {/* Logo */}
       <div className="flex flex-col items-center space-y-8">
-        <img
-          src="https://cdn.prod.website-files.com/62ecfefc58b878e68b3c7c20/6673f3ade8f353e75cd1f090_Vector.svg"
-          alt="maxion logo"
-          className="h-10 mb-2"
-        />
-        <p className="text-white text-xl font-poppins font-extrabold uppercase">Maxion Dev Hub</p>
+        <div className="flex flex-col items-center space-y-2">
+          <img
+            src="https://cdn.prod.website-files.com/62ecfefc58b878e68b3c7c20/6673f3ade8f353e75cd1f090_Vector.svg"
+            alt="maxion logo"
+            className="h-10 mb-2"
+          />
+          <p className="text-white text-xl font-poppins font-extrabold uppercase">
+            Maxion Dev Hub
+          </p>
+          {email && (
+            <p className="text-white text-sm font-poppins font-extrabold">{email}</p>
+          )}
+        </div>
         {/* Navigation Tabs */}
         <nav className="flex flex-col space-y-2 w-full">
           {tabs.map((tab, idx) => (

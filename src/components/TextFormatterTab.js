@@ -47,6 +47,7 @@ const TextFormatterTab = ({ mode }) => {
   const [isString, setIsString] = useState(false);
   const [removeDuplicates, setRemoveDuplicates] = useState(false);
   const [convertToLines, setConvertToLines] = useState(false);
+  const [splitByLines, setSplitByLines] = useState(false);
   const [showToast, setShowToast] = useState(false);
 
   const inputTextRef = useRef(null);
@@ -151,7 +152,9 @@ const TextFormatterTab = ({ mode }) => {
       return;
     }
 
-    let numbers = input.split(/\s+|,/).filter(Boolean);
+    let numbers = splitByLines
+      ? input.split('\n').filter(Boolean)
+      : input.split(/\s+|,/).filter(Boolean);
 
     if (removeDuplicates) {
       numbers = Array.from(new Set(numbers));
@@ -242,13 +245,13 @@ const TextFormatterTab = ({ mode }) => {
           </div>
 
           {/* Controls */}
-          <div className="flex flex-col items-center justify-center space-y-4 min-w-[120px]">
+          <div className="flex flex-col items-center justify-center space-y-4 min-w-[120px] max-w-48">
             {/* Delimiters Mode Controls */}
             {!isJsonMode && !isEnvMode && (
               <>
                 <Listbox value={selectedSymbol} onChange={setSelectedSymbol}>
-                  <div className="relative w-44">
-                    <ListboxButton className="h-10 w-44 flex justify-between items-center p-3 px-5 cursor-pointer rounded-lg border border-buttonBorder bg-subBackground text-white">
+                  <div className="relative w-full">
+                    <ListboxButton className="h-10 w-full flex justify-between items-center p-3 px-5 cursor-pointer rounded-lg border border-buttonBorder bg-subBackground text-white">
                       <span className="block truncate">{selectedSymbol.label}</span>
                       <FontAwesomeIcon icon={faChevronDown} />
                     </ListboxButton>
@@ -286,8 +289,8 @@ const TextFormatterTab = ({ mode }) => {
                 </Listbox>
 
                 <Listbox value={selectedBracket} onChange={setSelectedBracket}>
-                  <div className="relative w-44">
-                    <ListboxButton className="h-10 w-44 flex justify-between items-center p-3 px-5 cursor-pointer rounded-lg border border-buttonBorder bg-subBackground text-white">
+                  <div className="relative w-full">
+                    <ListboxButton className="h-10 w-full flex justify-between items-center p-3 px-5 cursor-pointer rounded-lg border border-buttonBorder bg-subBackground text-white">
                       <span className="block truncate">{selectedBracket.label}</span>
                       <FontAwesomeIcon icon={faChevronDown} />
                     </ListboxButton>
@@ -325,8 +328,8 @@ const TextFormatterTab = ({ mode }) => {
                 </Listbox>
 
                 <Listbox value={selectedTextCase} onChange={setSelectedTextCase}>
-                  <div className="relative w-44">
-                    <ListboxButton className="h-10 w-44 flex justify-between items-center p-3 px-5 cursor-pointer rounded-lg border border-buttonBorder bg-subBackground text-white">
+                  <div className="relative w-full">
+                    <ListboxButton className="h-10 w-full flex justify-between items-center p-3 px-5 cursor-pointer rounded-lg border border-buttonBorder bg-subBackground text-white">
                       <span className="block truncate">{selectedTextCase.label}</span>
                       <FontAwesomeIcon icon={faChevronDown} />
                     </ListboxButton>
@@ -363,7 +366,25 @@ const TextFormatterTab = ({ mode }) => {
                   </div>
                 </Listbox>
 
-                <div className="flex items-center justify-between w-44 space-x-3">
+                {/* Split by Lines */}
+                <div className="flex items-center justify-between w-full space-x-3">
+                  <span className="text-customGrayLight">Split by Lines</span>
+                  <button
+                    onClick={() => setSplitByLines(!splitByLines)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
+                      splitByLines ? 'bg-primary' : 'bg-[#3f3f3f]'
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        splitByLines ? 'translate-x-6' : 'translate-x-1'
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                {/* Add Quotes */}
+                <div className="flex items-center justify-between w-full space-x-3">
                   <span className="text-customGrayLight">Add Quotes</span>
                   <button
                     onClick={() => setIsString(!isString)}
@@ -379,8 +400,9 @@ const TextFormatterTab = ({ mode }) => {
                   </button>
                 </div>
 
-                <div className="flex items-center justify-between w-44 space-x-3">
-                  <span className="text-customGrayLight ">Remove Duplicates</span>
+                {/* Remove Duplicates */}
+                <div className="flex items-center justify-between w-full space-x-3">
+                  <span className="text-customGrayLight">Remove Duplicates</span>
                   <button
                     onClick={() => setRemoveDuplicates(!removeDuplicates)}
                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
@@ -395,7 +417,8 @@ const TextFormatterTab = ({ mode }) => {
                   </button>
                 </div>
 
-                <div className="flex items-center justify-between w-44 space-x-3">
+                {/* Convert to Lines */}
+                <div className="flex items-center justify-between w-full space-x-3">
                   <span className="text-customGrayLight">Convert to Lines</span>
                   <button
                     onClick={() => setConvertToLines(!convertToLines)}
@@ -417,7 +440,7 @@ const TextFormatterTab = ({ mode }) => {
             <button
               onClick={handleConvert}
               disabled={!input.trim()}
-              className={`h-10 w-44 p-3 rounded-lg flex justify-center items-center space-x-3 ${
+              className={`h-10 w-full p-3 rounded-lg flex justify-center items-center space-x-3 ${
                 !input.trim()
                   ? 'text-white bg-[#3f3f3f] cursor-not-allowed'
                   : 'text-black bg-primary hover:bg-primary/90'
@@ -431,7 +454,7 @@ const TextFormatterTab = ({ mode }) => {
                 setInput('');
                 setOutput('');
               }}
-              className="h-10 w-44 p-3 rounded-lg flex justify-center items-center bg-red-600 hover:bg-red-700 text-white transition-all duration-300"
+              className="h-10 w-full p-3 rounded-lg flex justify-center items-center bg-red-600 hover:bg-red-700 text-white transition-all duration-300"
             >
               Clear
             </button>
@@ -440,7 +463,7 @@ const TextFormatterTab = ({ mode }) => {
               <button
                 onClick={handleCopy}
                 disabled={!output.trim()}
-                className={`h-10 w-44 p-3 rounded-lg flex justify-center items-center space-x-3 ${
+                className={`h-10 w-full p-3 rounded-lg flex justify-center items-center space-x-3 ${
                   !output.trim()
                     ? 'text-white bg-[#3f3f3f] cursor-not-allowed'
                     : 'bg-green-600 hover:bg-green-700 text-white'

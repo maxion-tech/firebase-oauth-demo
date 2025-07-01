@@ -60,6 +60,7 @@ const App = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [allowanceAmount, setAllowanceAmount] = useState();
   const [selectedServer, setSelectedServer] = useState(DEFAULT_SERVER);
+  const [email, setEmail] = useState();
 
   const { account, activateBrowserWallet, deactivate, library, switchNetwork } =
     useEthers();
@@ -160,6 +161,7 @@ const App = () => {
         setRefreshToken={setRefreshToken}
         setProvider={setProvider}
         firebaseApp={provider.firebaseApp}
+        setEmail={setEmail}
       />
       <div className="flex h-screen w-full bg-subBackground2 overflow-hidden">
         {/* Sidebar */}
@@ -167,6 +169,7 @@ const App = () => {
           selectedIndex={selectedIndex}
           setSelectedIndex={setSelectedIndex}
           isAuthenticated={auth}
+          email={email}
         />
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col h-full min-h-0">
@@ -186,6 +189,7 @@ const App = () => {
                         copyRefreshToken={copyRefreshToken}
                         setCopyRefreshToken={setCopyRefreshToken}
                         setAuth={setAuth}
+                        email={email}
                       />
                     </div>
                   </div>
@@ -322,6 +326,7 @@ const App = () => {
                 setAuth={setAuth}
                 setToken={setToken}
                 setRefreshToken={setRefreshToken}
+                setEmail={setEmail}
               />
             )}
           </div>

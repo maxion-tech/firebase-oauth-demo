@@ -18,6 +18,7 @@ const LoginSection = ({
   setAuth,
   setToken,
   setRefreshToken,
+  setEmail,
 }) => {
   return (
     <div className="h-full w-full flex flex-col space-y-5 items-center justify-center">
@@ -74,6 +75,7 @@ const LoginSection = ({
             setToken={setToken}
             setRefreshToken={setRefreshToken}
             firebaseApp={provider.firebaseApp}
+            setEmail={setEmail}
           />
           <FacebookSignInButton
             setAuth={setAuth}

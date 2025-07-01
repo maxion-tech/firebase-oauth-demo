@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { platformFirebase } from '../config/firebaseConfig';
 import { ProviderType, providers } from '../constants';
 
-const AuthStateListener = ({ setAuth, setToken, setRefreshToken, setProvider }) => {
+const AuthStateListener = ({ setAuth, setToken, setRefreshToken, setProvider, setEmail }) => {
   const [authStateInitialized, setAuthStateInitialized] = useState(false);
 
   useEffect(() => {
@@ -17,10 +17,9 @@ const AuthStateListener = ({ setAuth, setToken, setRefreshToken, setProvider }) 
         setProvider(provider);
         window.localStorage.setItem('auth', 'true');
         const token = await user.getIdToken();
-        const userEmail = user.email;
-        console.log("user's email: ", userEmail);
         setToken(token);
         setRefreshToken(user.refreshToken);
+        setEmail(user.email);
       } else {
         // User is signed out
         console.log('User is signed out Platform');
@@ -32,7 +31,7 @@ const AuthStateListener = ({ setAuth, setToken, setRefreshToken, setProvider }) 
         setAuthStateInitialized(true);
       }
     });
-  }, [setAuth, authStateInitialized, setToken, setRefreshToken, setProvider]); // Include authStateInitialized in the dependency array
+  }, [setAuth, authStateInitialized, setToken, setRefreshToken, setProvider, setEmail]); // Include authStateInitialized in the dependency array
 
   // Render nothing until the authentication state is initialized
   if (!authStateInitialized) {
