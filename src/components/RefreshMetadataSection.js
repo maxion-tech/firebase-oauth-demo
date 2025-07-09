@@ -1,7 +1,7 @@
 import { faImage, faRotateRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 const RefreshMetadataSection = () => {
   const [blacklistedNfts, setBlacklistedNfts] = useState([]);
@@ -23,13 +23,6 @@ const RefreshMetadataSection = () => {
     fetchBlacklistedNfts();
   }, []);
 
-  // Fetch images for blacklisted NFTs when the list changes
-  useEffect(() => {
-    if (blacklistedNfts.length > 0) {
-      fetchNftImages();
-    }
-  }, [blacklistedNfts]);
-
   const fetchBlacklistedNfts = async () => {
     setIsLoading(true);
     try {
@@ -48,7 +41,7 @@ const RefreshMetadataSection = () => {
     }
   };
 
-  const fetchNftImages = async () => {
+  const fetchNftImages = useCallback(async () => {
     const imagePromises = blacklistedNfts.map(async (nftId) => {
       try {
         const response = await axios.get(`https://rolg-nft-apis.maxion.gg/item/${nftId}`);
@@ -69,7 +62,14 @@ const RefreshMetadataSection = () => {
     } catch (error) {
       console.error('Error fetching NFT images:', error);
     }
-  };
+  }, [blacklistedNfts]);
+
+  // Fetch images for blacklisted NFTs when the list changes
+  useEffect(() => {
+    if (blacklistedNfts.length > 0) {
+      fetchNftImages();
+    }
+  }, [fetchNftImages, blacklistedNfts]);
 
   const handleSelectNft = (tokenId) => {
     setSelectedNfts((prev) =>
@@ -106,7 +106,7 @@ const RefreshMetadataSection = () => {
         throw new Error('API key not found. Please check your environment variables.');
       }
 
-      const response = await axios.post(
+      await axios.post(
         `${process.env.REACT_APP_SKYMAVIS_GATEWAY_API_URL}/mavis-market-partner/collections/0xf6fe00893eea4d47f0cba303ef518fe4ab1c9dd6/refresh_metadata`,
         {
           token_ids: tokenIds.map((id) => id.toString()),
