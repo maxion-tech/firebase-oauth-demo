@@ -11,6 +11,7 @@ import ContractInteractions from './components/ContractInteractions';
 import CustomDialog from './components/Dialog';
 import LoginSection from './components/LoginSection';
 import MarketplaceListingSection from './components/MarketplaceListingSection';
+import RefreshMetadataSection from './components/RefreshMetadataSection';
 import Sidebar from './components/Sidebar';
 import TextFormatterTab from './components/TextFormatterTab';
 import WalletConnection from './components/WalletConnection';
@@ -315,6 +316,11 @@ const App = () => {
                 {selectedIndex === 6 && (
                   <div className="rounded-lg bg-subBackground p-6 shadow-md h-full">
                     <TextFormatterTab mode="env" />
+                  </div>
+                )}
+                {selectedIndex === 7 && (
+                  <div className="rounded-lg bg-subBackground p-6 shadow-md h-full">
+                    <RefreshMetadataSection />
                   </div>
                 )}
               </div>
