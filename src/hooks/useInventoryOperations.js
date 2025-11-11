@@ -133,56 +133,47 @@ export const useInventoryOperations = (token, selectedServer = DEFAULT_SERVER) =
       async () => {
         setIsMinting(true);
         resetMintingCancelState();
-        let processedCount = 0;
-        let successCount = 0;
-        let failCount = 0;
         const totalItems = selectedItems.size;
 
-        for (const inventoryId of selectedItems) {
-          // Check if operation was cancelled
-          if (cancelMintingRef.current) {
-            break;
-          }
-
-          try {
-            setMintingProgress({ current: processedCount + 1, total: totalItems });
-
-            const result = await axios.post(
-              `${apiUrls[selectedServer]}/mint-inventory/mint`,
-              { mintInventoryId: inventoryId },
-              { headers: { Authorization: `Bearer ${token}`, 'X-Server-Id': 1 } },
-            );
-
-            if (result) {
-              await refetchInventoriesWithoutLoading();
-              successCount++;
-            }
-
-            processedCount++;
-            await sleep(2000);
-          } catch (error) {
-            console.log(error);
-            failCount++;
-            processedCount++;
-            await sleep(4000);
-          }
+        // Check if operation was cancelled before starting
+        if (cancelMintingRef.current) {
+          setIsMinting(false);
+          setMintingProgress({ current: 0, total: 0 });
+          resetMintingCancelState();
+          return;
         }
 
-        const operationMessage = cancelMintingRef.current
-          ? `Minting cancelled! Processed: ${processedCount}/${totalItems}, Success: ${successCount}, Failed: ${failCount}`
-          : `Minting complete! Success: ${successCount}, Failed: ${failCount}`;
+        try {
+          setMintingProgress({ current: 1, total: totalItems });
 
-        showDialog(
-          cancelMintingRef.current
-            ? 'warning'
-            : successCount > 0 && failCount === 0
-            ? 'success'
-            : failCount > 0
-            ? 'warning'
-            : 'info',
-          cancelMintingRef.current ? 'Minting Cancelled' : 'Minting Complete',
-          operationMessage,
-        );
+          // Build payload with items array
+          const items = Array.from(selectedItems).map((inventoryId) => ({
+            mintInventoryId: inventoryId,
+          }));
+
+          const result = await axios.post(
+            `${apiUrls[selectedServer]}/mint-inventory/mint-batch`,
+            { items },
+            { headers: { Authorization: `Bearer ${token}`, 'X-Server-Id': 1 } },
+          );
+
+          if (result) {
+            await refetchInventoriesWithoutLoading();
+            setMintingProgress({ current: totalItems, total: totalItems });
+            showDialog(
+              'success',
+              'Minting Complete',
+              `Successfully minted ${totalItems} item(s)!`,
+            );
+          }
+        } catch (error) {
+          console.log(error);
+          showDialog(
+            'warning',
+            'Minting Failed',
+            error.response?.data?.message || `Failed to mint items. Please try again.`,
+          );
+        }
 
         setSelectedItems(new Set());
         setIsMinting(false);
