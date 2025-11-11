@@ -124,8 +124,6 @@ export const useInventoryOperations = (token, selectedServer = DEFAULT_SERVER) =
     return data;
   };
 
-  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
   const handleBulkMint = async () => {
     showConfirmDialog(
       'Confirm Bulk Mint',
